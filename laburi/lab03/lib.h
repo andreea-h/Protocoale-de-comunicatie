@@ -2,11 +2,11 @@
 #define LIB
 
 #define MSGSIZE		1400  //dimesiunea maxima a unui cadru trimis
-#define COUNT       1000 //numarul de cadre trimise
+#define COUNT       100 //numarul de cadre trimise
 
 typedef struct {
   int len;
-  int check_sum;
+  int c_sum;
   char payload[MSGSIZE];
   
 } msg;

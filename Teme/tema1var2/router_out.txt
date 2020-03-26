@@ -1,0 +1,90 @@
+ARP packet
+1
+request
+sender: 192 168 3 2 target: 192  168  3  1  adresa 255.255.0 2
+192.255.228.0 192.255.228.2 ¡	
+intreface_ip: 192.168.3.1
+mac 222 512
+237
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+ARP packet
+1
+request
+sender: 192 168 3 2 target: 192  168  3  1  adresa 255.0 0
+192.255.229.0 192.255.229.2 255.q	
+intreface_ip: 192.168.3.1
+mac 222 512
+237
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+IP packet
+2048
+ARP packet
+1
+request
+sender: 192 168 2 2 target: 192  168  2  1  adresa 0 1
+192.255.230.0 192.255.230.2 255.255.A	
+intreface_ip: 192.168.2.1
+mac 222 512
+237
+IP packet
+2048
+IP packet
+2048
