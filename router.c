@@ -286,8 +286,15 @@ int main(int argc, char *argv[])
     			//pachet aruncat
     		}
     		
+
+			if(checksum(ip_hdr, sizeof(struct iphdr)) != 0)
+				continue;
+
+					
     		(ip_hdr->ttl) -= 1;
     		
+    		ip_hdr->check = 0;
+    		ip_hdr->check = checksum(ip_hdr, sizeof(struct iphdr));
     		
     		//extrag intrarea din tabela de rutare cu cea mai buna potrivire cu daddr, ca sa aflu next_hop ul
     		struct route_table_entry *best_route = get_best_route(ip_hdr->daddr);
