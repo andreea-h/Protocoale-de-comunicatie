@@ -202,14 +202,16 @@ int main(int argc, char *argv[])
 
 		
 		if(type == 2048) {
-			printf("IP packet\n");
+			printf("IP packet: ");
 			
 			struct iphdr *ip_hdr = (struct iphdr *)(m.payload + sizeof(struct ether_header));
 			__u32 dest = ip_hdr->daddr;
 
+			
+
 			struct in_addr ip_addr;
-    		ip_addr.s_addr = ntohl(dest);
-    		printf("dest ip address: %s\n", inet_ntoa(ip_addr));
+    		ip_addr.s_addr = dest;
+    		printf("dest ip address: %s; ", inet_ntoa(ip_addr));
     		ip_addr.s_addr = ntohl(ip_hdr->saddr);
     		printf("ip_source_address %s\n", inet_ntoa(ip_addr));
 
@@ -262,13 +264,9 @@ int main(int argc, char *argv[])
     			}
     		}
     		
-    	//	printf("TTL: %d\n", ip_hdr->ttl);
-    		
-    		printf("TTL: %d\n", ip_hdr->ttl);
-
     		
     		//verifica ttl-ul
-    	/*	if(ip_hdr->ttl <= 1) {
+    		if(ip_hdr->ttl <= 1) {
     			printf("AICI\n");
     			//trimite icmp corect sursei
     			struct icmphdr *icmp_hdr = (struct icmphdr *)(m.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
@@ -283,24 +281,20 @@ int main(int argc, char *argv[])
  				memcpy(&src, &(ip_hdr->saddr), 4);
  				memcpy(&(ip_hdr->saddr), &(ip_hdr->daddr), 4);
  				memcpy(&(ip_hdr->daddr), &src, 4);
-
-
 	 			send_packet(m.interface, &m);
 	 			continue;
     			//pachet aruncat
-    		}*/
+    		}
     		
-    		//(ip_hdr->ttl)--;
-    		/*struct icmphdr *icmp_hdr = (struct icmphdr *)(m.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
-    		icmp_hdr->checksum = 0;
-			icmp_hdr->checksum = checksum(icmp_hdr, sizeof(struct icmphdr) + sizeof(m.payload));*/
-
+    		(ip_hdr->ttl) -= 1;
+    		
+    		
     		//extrag intrarea din tabela de rutare cu cea mai buna potrivire cu daddr, ca sa aflu next_hop ul
     		struct route_table_entry *best_route = get_best_route(ip_hdr->daddr);
     		
     		if(best_route != NULL) {
 
-    		//	printf("next hop %u\n", best_route->next_hop);
+    			printf("NEXT HOP %u\n", best_route->next_hop);
     			//afiseaza tabela ARP
     		
     			//cautam adresa MAC a next-hop ului in tabela ARP
@@ -315,11 +309,17 @@ int main(int argc, char *argv[])
  					memcpy(eth_hdr->ether_dhost, arp_entry->mac, 6);
 
  					//seteaza adresa mac sursa ca fiind adresa mac a interfetei routerului 	
- 				//	uint8_t mac;
- 				//	get_interface_mac(m.interface, &mac);
- 				//	memcpy(eth_hdr->ether_shost, &mac, 6);
-				//	printf("aici se trimite un pachet cu mac %d\n, mac");
+ 					uint8_t mac;
+ 					get_interface_mac(best_route->interface, &mac);
+ 					
+ 					memcpy(eth_hdr->ether_shost, &mac, 6);
+ 					int i;
+					printf("aici se trimite un pachet cu adesa mac sursa: ");
+					for(i = 0; i < 6; i++) { 
+						printf("%02x ", eth_hdr->ether_shost[i]);
+					}
 
+					printf("\n");
 					send_packet(best_route->interface, &m); 
  				}
  				else {
@@ -330,6 +330,8 @@ int main(int argc, char *argv[])
 	 				//obtine adresa MAC a interfetei routeului
 	 				//seteaza tipul de mesaj pe arp request
 
+
+ 					
 					uint8_t mac;
 					get_interface_mac(m.interface, &mac);
 				//	printf("mac: %u\n ", mac);
@@ -403,13 +405,25 @@ int main(int argc, char *argv[])
 	 				// dupa ce s-a trimis un arp request pentru a afla adresa MAC a destinatiei
 	 				// pachetul este adaugat in coada, urmand sa fie dirijat cand routerul primeste ARP reply
 	 				
-	 				m.interface = best_route->interface;
-	 				void *p = &m;
-	 				
-	 				queue_enq(packets, p);
+	 				printf("aiccccccccccccccci %d\n", eth_hdr->ether_type);
+	 				if(eth_hdr->ether_type == htons(0X0800)) {
+	 					m.interface = best_route->interface;
+	 					
+	 					//memcpy(&(m.interface),&(best_route->interface), 4);
+	 					void *p = &m;
+	 					printf("m.interface: %u\n", m.interface);
+	 					printf("type %d\n", eth_hdr->ether_type);
+	 					queue_enq(packets, (&m));
+	 					if(queue_empty(packets) == 1) {
+	 						printf("coada goalaaaaaaaaaaaaaaaaaaaaaaaa");
+	 					}
+	 				}
+
+	 				continue;
  				}
     		}
     		if(best_route == NULL) {
+    			printf("NU STIU CUM SA TRIMIT ACEST PACHET!!!!\n");
     			// DESTINATION HOST UNREACHABLE (pachetul acesta nu imi este detinatie mie, routerului)
     			// pachet cu adresa inexistenta in tabela de rutare
     			// vom trimite un mesaj IMCP corect sursei (destination unreachable)
@@ -426,12 +440,10 @@ int main(int argc, char *argv[])
  			    memcpy(&(new_eth_hdr->ether_shost), &(eth_hdr->ether_dhost), 6);
  			    memcpy(&(new_eth_hdr->ether_dhost), &mac, 6);
  				
-
  				uint32_t src;
  				memcpy(&src, &(ip_hdr->saddr), 4);
  				memcpy(&(new_ip_hdr->saddr), &(ip_hdr->daddr), 4);
  				memcpy(&(new_ip_hdr->daddr), &src, 4);
-
  				
  				new_ip_hdr->version = 4; //se "seteaza" versiunea IPv4
 				new_ip_hdr->ihl = 5; //lungimea headerului (5 cuvinte de 32 de biti fiecare)
@@ -446,7 +458,6 @@ int main(int argc, char *argv[])
 			    //calculeaza checksum-ul
 			    new_ip_hdr->check = 0;
 			    new_ip_hdr->check = checksum(new_ip_hdr, sizeof(struct iphdr));
-
 			    //seteaza campurile aferente header-ului icmp
 			    new_icmp_hdr->code = 0;
 				new_icmp_hdr->type = 3;
@@ -481,13 +492,13 @@ int main(int argc, char *argv[])
 
 
 		if(type == 2054) {//pachet ARP
-			printf("ARP packet\n");
+			printf("ARP packet: ");
 
 			u_short arp_type = ntohs(arp_hdr->arp_op);
 			printf("%hu\n", arp_type);
 			if(arp_type == ARPOP_REQUEST) {  //ARP request, trebuie verificat daca pachetul primit este destinat routerului
 				//se va compara adresa MAC destinatie din pachetul primit cu adresa MAC a interfetei routerului
-				printf("request\n");
+				printf("request: ");
 				
 				int i;
 				printf("sender: ");
@@ -500,7 +511,7 @@ int main(int argc, char *argv[])
 				for(i = 0 ; i < 4; i++) {
 					printf("%d  ", arp_hdr->arp_tpa[i]);
 				}
-				
+				printf("\n");
 				char *interface_ip = get_interface_ip(m.interface);
 			//	printf("intreface_ip: %s\n", interface_ip);
 
@@ -529,10 +540,9 @@ int main(int argc, char *argv[])
    				sprintf(target_ip_address, "%s", inet_ntoa(ip_addr));
 
    				//daca requestul este destinat routeului, voi trimite reply cu adresa mea MAC
-   				//adica voi trimite adresa MAC a interfetei routerului
+   				//adica voi trimite adresa MAC a interfetei routerului cu hostul care a facut cererea
 				if(strcmp(target_ip_address, interface_ip) == 0) {
 
-					printf("pentru mine\n");
 					memcpy(eth_hdr->ether_dhost, eth_hdr->ether_shost, 6);
 					memcpy(eth_hdr->ether_shost, &mac, 6);
 
@@ -554,13 +564,13 @@ int main(int argc, char *argv[])
 
 					send_packet(m.interface, &m); //trimite ARP reply cu adresa MAC a interfetei pe care s-a primit un pachet
 					
-					//continue;
+					continue;
 				}
 				
 			}
 
 			else if(arp_type == ARPOP_REPLY) { //ARP response
-				printf("reply\n");
+				printf("reply: ");
 				//adresa mac este in shost
 				//trebuie sa adaugam in tabela arp o noua intrare avand ip egal cu arp_hdr->srp_spa
 				//si adresa mac salvata in arp_hdr->sha
@@ -575,36 +585,39 @@ int main(int argc, char *argv[])
 						putere = putere * 256;
 					}
 					ip_address += (arp_hdr->arp_spa[i]) * putere;
-					printf("%d .", arp_hdr->arp_spa[i]);
+					printf("%d.", arp_hdr->arp_spa[i]);
 				}
 				
-				printf("size pt arp table: %d\n", arp_table_len);
-
+				printf("\n");
 				update_arp_table(ip_address, arp_hdr->arp_sha);
-				printf("size pt arp table: %d\n", arp_table_len);
+		
 				if(queue_empty(packets) != 1) { //coada nu este goala
 
 					void *pck = queue_deq(packets);
 					packet *my_packet = (packet*)pck;
+
 					//schimba adresa MAC destinatie cu adresa MAC primita prin ARP reply
 					struct ether_header *new_hdr = (struct ether_header *)(my_packet->payload);
-
+					printf("PACHET SCOS DIN COADA: %u\n", new_hdr->ether_type);
 					
 					//adresa MAC a intrefetei routerului
 					uint8_t mac;
-					get_interface_mac(m.interface, &mac);
+					get_interface_mac(my_packet->interface, &mac);
 					memcpy(new_hdr->ether_shost, &mac, 6);
 					memcpy(new_hdr->ether_dhost, arp_hdr->arp_sha, 6);
+					if(new_hdr->ether_type != 1544) {
+						send_packet(my_packet->interface, my_packet); //transmite un pachet extras din coada
+					}
 					
-					send_packet(my_packet->interface, my_packet); //transmite un pachet extras din coada
+				}
+				else {
+					printf("coada goala\n");
 				}
 			}
 		}
-
-
-
 				
 	}
+
+					
+
 }
-
-
