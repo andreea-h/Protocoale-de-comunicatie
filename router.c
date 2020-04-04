@@ -258,17 +258,15 @@ int main(int argc, char *argv[])
 
     		//verifica ttl-ul
     		if(ip_hdr->ttl <= 1) {
-				struct icmphdr *icmp_hdr = (struct icmphdr *)(m.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
+    		/*	struct icmphdr *icmp_hdr = (struct icmphdr *)(m.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
     		 	m.len = 42;
 				
-
-
     			uint8_t mac;
  			    memcpy(&mac, &(eth_hdr->ether_shost), 6);
  			    memcpy(&(eth_hdr->ether_shost), &(eth_hdr->ether_dhost), 6);
  			    memcpy(&(eth_hdr->ether_dhost), &mac, 6);
 
- 			    ip_hdr->tot_len = htons(28);
+ 			    ip_hdr->tot_len = htons(sizeof(struct iphdr) + sizeof(struct icmphdr));
  			   //  htons(sizeof(struct iphdr) + sizeof(struct icmphdr));
 
  				uint32_t src;
@@ -277,7 +275,7 @@ int main(int argc, char *argv[])
  				memcpy(&(ip_hdr->daddr), &src, 4);
  					
 
- 				ip_hdr->ttl = 0;	
+ 				ip_hdr->ttl = 64;	
  				ip_hdr->check = 0;
     			ip_hdr->check = checksum(ip_hdr, sizeof(struct iphdr));
  				
@@ -288,24 +286,7 @@ int main(int argc, char *argv[])
     			icmp_hdr->checksum = checksum(icmp_hdr, sizeof(struct icmphdr));
 
 				send_packet(m.interface, &m);
-				continue;
-    		/*	printf("AICI\n");
-    			//trimite icmp corect sursei
-    			struct icmphdr *icmp_hdr = (struct icmphdr *)(m.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
-    	
-    	 		icmp_hdr->type = 11;
-
-				uint8_t mac;
-	 			memcpy(&mac, &(eth_hdr->ether_shost), 6);
-	 			memcpy(&(eth_hdr->ether_shost), &(eth_hdr->ether_dhost), 6);
-	 			memcpy(&(eth_hdr->ether_dhost), &mac, 6);
-	 				
-	 			uint32_t src;
- 				memcpy(&src, &(ip_hdr->saddr), 4);
- 				memcpy(&(ip_hdr->saddr), &(ip_hdr->daddr), 4);
- 				memcpy(&(ip_hdr->daddr), &src, 4);
-	 			//send_packet(m.interface, &m); //trimite un pachet pt a semnala TTL Excedeed
-	 			continue; //pachet aruncat
+				continue;*/
 	 			
 	 			packet timeout;
 	 			timeout.len = 42;
@@ -315,42 +296,48 @@ int main(int argc, char *argv[])
     			struct icmphdr *new_icmp_hdr = (struct icmphdr *)(timeout.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
     			
     			//seteaza adresa sursa din headerul ethernet ca fiind adresa mac a interfetei routerului cu sursa pachetului 	
+ 			    uint8_t mac;
+ 			    memcpy(&mac, eth_hdr->ether_shost, 6); //adresa mac a interfetei
  			    memcpy(&(new_eth_hdr->ether_shost), &(eth_hdr->ether_dhost), 6);
- 			    memcpy(&(new_eth_hdr->ether_dhost), &(eth_hdr->ether_shost), 6);
+ 			    memcpy(&(new_eth_hdr->ether_dhost), &mac, 6);
  				new_eth_hdr->ether_type = htons(0X0800);
 
  				new_ip_hdr->version = 4; //se "seteaza" versiunea IPv4
-				new_ip_hdr->ihl = 5; //lungimea headerului (5 cuvinte de 32 de biti fiecare)
+ 				new_ip_hdr->ihl = 5; //lungimea headerului (5 cuvinte de 32 de biti fiecare)
  				new_ip_hdr->tot_len = htons(28);
+ 				new_ip_hdr->id = htons(getpid());
+				
+				uint16_t flag = 0x00;
+ 				new_ip_hdr->frag_off = 0x00;
  				new_ip_hdr->ttl = 64;  
-				new_ip_hdr->protocol = IPPROTO_ICMP; //tipul de protocol
-				new_ip_hdr->id = htons(getpid());
+				new_ip_hdr->protocol = 1; //tipul de protocol
 
-				uint8_t mac;
-				memcpy(&mac, &(ip_hdr->daddr), 4);
- 				//memcpy(&(new_ip_hdr->saddr), &mac, 4);
- 				//uint8_t mac2;
- 				//memcpy(&mac2, &(ip_hdr->saddr), 4);
- 				//memcpy(&(new_ip_hdr->daddr), &mac2, 4);
- 				new_ip_hdr->saddr = mac;
- 				memcpy(&mac, &(ip_hdr->daddr), 4);
- 				new_ip_hdr->saddr = mac;
-
-			    //calculeaza checksum-ul
-			    new_ip_hdr->check = 0;
+				new_ip_hdr->check = 0;
 			    new_ip_hdr->check = checksum(new_ip_hdr, sizeof(struct iphdr));
 
+				uint8_t mac2;
+				memcpy(&mac2, &(ip_hdr->saddr), 4);
+ 				memcpy(&(new_ip_hdr->saddr), &mac2, 4);
+ 				uint8_t mac3;
+ 				memcpy(&mac3, &(ip_hdr->daddr), 4);
+ 				memcpy(&(new_ip_hdr->daddr), &mac3, 4);
+			   
+
 			    //seteaza campurile aferente header-ului icmp
+			   	new_icmp_hdr->type = 11;
 			    new_icmp_hdr->code = 0;
-				new_icmp_hdr->type = htons(11);
+				
+
+				//seteaza checksum-ul
+				
 				new_icmp_hdr->un.echo.id = htons(getpid());
 				
 				new_icmp_hdr->un.echo.sequence = htons(received++);
 				
-				//seteaza checksum-ul
+				
 				new_icmp_hdr->checksum = 0;
 				new_icmp_hdr->checksum = checksum(new_icmp_hdr, sizeof(struct icmphdr));
-
+				
 				printf("%d\n", m.interface);
 				send_packet(m.interface, &timeout);
 				continue; //se arunca vechiul pachet*/
@@ -439,7 +426,10 @@ int main(int argc, char *argv[])
 	 				uint16_t new_code2 = htons(0x0001);
 					memcpy(&(new_arp_hdr->arp_op), &new_code2, 2);
 
-					memcpy(new_arp_hdr->arp_sha, eth_hdr->ether_shost, 6);
+					//memcpy(new_arp_hdr->arp_sha, eth_hdr->ether_shost, 6);
+					uint8_t mac2;
+					get_interface_mac(best_route->interface, &mac2);
+					memcpy(new_arp_hdr->arp_sha, &mac2, 6);
 
 	 				char *interface_ip = get_interface_ip(m.interface);
 	 				//converteste adresa IP din format char* in format hexa
@@ -495,48 +485,61 @@ int main(int argc, char *argv[])
     			// DESTINATION HOST UNREACHABLE (pachetul acesta nu imi este detinatie mie, routerului)
     			// pachet cu adresa inexistenta in tabela de rutare
     			// vom trimite un mesaj IMCP corect sursei (destination unreachable)
-    		/*	packet unreachable;
-    			unreachable.len = sizeof(struct ether_header) + sizeof(struct iphdr)+ sizeof(struct icmphdr);
+    			
+    			packet unreachable;
+	 			unreachable.len = 42;
+
     			struct ether_header *new_eth_hdr = (struct ether_header *)(unreachable.payload);
     			struct iphdr *new_ip_hdr = (struct iphdr*)(unreachable.payload + sizeof(struct ether_header));
     			struct icmphdr *new_icmp_hdr = (struct icmphdr *)(unreachable.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
-    			new_eth_hdr->ether_type = 2048;
-    			//seteaza adresa sursa din headerul ethernet ca fiind adresa mac a interfetei routerului 	
- 				uint8_t mac;
- 			   
- 			    memcpy(&mac, &(eth_hdr->ether_shost), 6);
+    			
+    			//seteaza adresa sursa din headerul ethernet ca fiind adresa mac a interfetei routerului cu sursa pachetului 	
+ 			    uint8_t mac;
+ 			    memcpy(&mac, eth_hdr->ether_shost, 6); //adresa mac a interfetei
  			    memcpy(&(new_eth_hdr->ether_shost), &(eth_hdr->ether_dhost), 6);
  			    memcpy(&(new_eth_hdr->ether_dhost), &mac, 6);
- 				
- 				uint32_t src;
- 				memcpy(&src, &(ip_hdr->saddr), 4);
- 				memcpy(&(new_ip_hdr->saddr), &(ip_hdr->daddr), 4);
- 				memcpy(&(new_ip_hdr->daddr), &src, 4);
- 				
+ 				new_eth_hdr->ether_type = htons(0X0800);
+
  				new_ip_hdr->version = 4; //se "seteaza" versiunea IPv4
-				new_ip_hdr->ihl = 5; //lungimea headerului (5 cuvinte de 32 de biti fiecare)
-				                 // imi arata cate cuvinte(de 32 biti fiecare) se citesc mai departe pt header
-				new_ip_hdr->ttl = 64;  //seteaza ttl-ul incremental
-				new_ip_hdr->protocol = IPPROTO_ICMP; //tipul de protocol
-				new_ip_hdr->id = htons(getpid());
-			    new_ip_hdr->daddr = ip_addr.s_addr; //destination address - address in network byte order
-			    									//(uint32_t)
-			    
-			    new_ip_hdr->tot_len = htons(sizeof(struct iphdr) + sizeof(struct icmphdr));
-			    //calculeaza checksum-ul
-			    new_ip_hdr->check = 0;
+ 				new_ip_hdr->ihl = 5; //lungimea headerului (5 cuvinte de 32 de biti fiecare)
+ 				new_ip_hdr->tot_len = htons(28);
+ 				new_ip_hdr->id = htons(getpid());
+				
+				uint16_t flag = 0x00;
+ 				new_ip_hdr->frag_off = 0x00;
+ 				new_ip_hdr->ttl = 64;  
+				new_ip_hdr->protocol = 1; //tipul de protocol
+
+				new_ip_hdr->check = 0;
 			    new_ip_hdr->check = checksum(new_ip_hdr, sizeof(struct iphdr));
+
+				uint8_t mac2;
+				memcpy(&mac2, &(ip_hdr->saddr), 4);
+ 				memcpy(&(new_ip_hdr->saddr), &mac2, 4);
+ 				uint8_t mac3;
+ 				memcpy(&mac3, &(ip_hdr->daddr), 4);
+ 				memcpy(&(new_ip_hdr->daddr), &mac3, 4);
+			   
+
 			    //seteaza campurile aferente header-ului icmp
+			   	new_icmp_hdr->type = 3;
 			    new_icmp_hdr->code = 0;
-				new_icmp_hdr->type = 3;
+				
+
+				//seteaza checksum-ul
+				
 				new_icmp_hdr->un.echo.id = htons(getpid());
 				
-				//seteaza checksum-ul
+				new_icmp_hdr->un.echo.sequence = htons(received++);
+				
+				
 				new_icmp_hdr->checksum = 0;
 				new_icmp_hdr->checksum = checksum(new_icmp_hdr, sizeof(struct icmphdr));
-
-				send_packet(m.interface, &unreachable);*/
-
+				
+				printf("%d\n", m.interface);
+				send_packet(m.interface, &unreachable);
+				continue; //se arunca vechiul pachet*/
+				/*
 				struct icmphdr *icmp_hdr = (struct icmphdr *)(m.payload + sizeof(struct ether_header) + sizeof(struct iphdr));
     		 	m.len = 42;
 				ip_hdr->ttl -= 1;
@@ -563,7 +566,7 @@ int main(int argc, char *argv[])
  				icmp_hdr->checksum = 0;
     			icmp_hdr->checksum = checksum(icmp_hdr, sizeof(struct icmphdr));
 				send_packet(m.interface, &m);
-				continue;
+				continue;*/
     		}
 		} //2048 == 0x0800 //pachet IP
 
