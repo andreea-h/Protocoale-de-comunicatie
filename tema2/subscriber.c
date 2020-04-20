@@ -106,6 +106,9 @@ int main(int argc, char *argv[])
 				break;
 			}
 
+			//TODO verifica formatul pentru mesajul trimis de client:
+			//valori corect pentru componenta sf?
+
 			//verifica daca comanda pe care o trimite clientul catre server respecta formatul enuntat
 			char *buff_temp = (char *)malloc(BUFLEN * sizeof(char));
 			strcpy(buff_temp, buffer);
@@ -169,10 +172,15 @@ int main(int argc, char *argv[])
 			int sending1 = send(sock_fd, &request, sizeof(request), 0);
 			if(sending1 < 0) {
 				exit_error("[!] Send error for client...\n");
+				continue;
 			}
-
-
-			//printf("ai introdus: %s\n", buffer);
+			//afiseaza feedback pentru comanda tocmai trimisa catre server de catre client
+			if(request.request_type == 's') {
+				printf("subscribed %s\n", request_topic.topic_name);
+			}
+			else if(request.request_type == 'u') {
+				printf("unsubscribed %s\n", request_topic.topic_name);
+			}
 		}
 		else {
 			memset(buffer, 0, BUFLEN);
