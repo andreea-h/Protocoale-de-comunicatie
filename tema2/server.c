@@ -10,7 +10,7 @@
 #include <netinet/tcp.h>
 #include "utils.h"
 
-#define BUFLEN 1501
+#define BUFLEN 1551
 #define MAX_CLIENTS 1000
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
@@ -309,16 +309,18 @@ int main(int argc, char *argv[])
 				else if(i == pass_socket_udp) { //serverul va primi datagrame de la clienti udp
 					socklen_t socklen;
 					
-					int rec = recvfrom(pass_socket_udp, buff, BUFLEN, 0, (struct sockaddr *) &udp_sock, &socklen);
+					publisher_message pub_message;
+
+					int rec = recvfrom(pass_socket_udp, &pub_message, sizeof(publisher_message), 0, (struct sockaddr *) &udp_sock, &socklen);
 					if(rec < 0) {
 						exit_error("[!] Receiving error\n");
 						return 1;
 					}
-					printf("am primit: %s, dimensiune date: %ld\n", buff, strlen(buff));
+					//printf("am primit: %s, dimensiune date: %ld\n", buff, strlen(buff));
 					
 					//mesajul upd trebuie trimis mai departe catre clientii tcp abonati la topicul din mesaj
 					//formateaza mesajul udp primit
-					char topic[51];
+				/*	char topic[51];
 					strncpy(topic, buff, 50);
 					topic[50] = '\0';
 					printf("topic mesaj primit: %s\n", topic);
@@ -334,14 +336,35 @@ int main(int argc, char *argv[])
 					}
 
 					printf("mesaj: %s\n", msg);
-					
+				*/	
 					//se construieste mesajul tcp catre clienti pe baza mesajului upd primit
 
 					//*****TODO*******
-					
+
+					printf("topic mesaj primit: %s\n", pub_message.topic_name);
+					printf("tipul este: %hu\n", pub_message.data_type);
+					printf("mesaj: %s\n", pub_message.message);
 
 					
-					memset(buff, 0, BUFLEN);
+					subscriber_message *sub_message = (subscriber_message *)malloc(sizeof(subscriber_message));
+					strcpy(sub_message->topic_name, pub_message.topic_name);
+					if(pub_message.data_type == 0) {
+						strcpy(sub_message->data_type, "INT");
+					}
+					else if(pub_message.data_type == 1) {
+						strcpy(sub_message->data_type, "SHORT_REAL");
+					}
+					else if(pub_message.data_type == 2) {
+						strcpy(sub_message->data_type, "FLOAT");
+					}
+					else if(pub_message.data_type == 3) {
+						strcpy(sub_message->data_type, "STRING");
+					}
+					strcpy(sub_message->message, pub_message.message);
+
+					sub_message->client_port = ntohs(udp_sock.sin_port);
+                    strcpy(sub_message->ip_source, inet_ntoa(udp_sock.sin_addr));
+
 				}
 
 				else {

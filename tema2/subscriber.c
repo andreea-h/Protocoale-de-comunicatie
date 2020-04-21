@@ -188,6 +188,10 @@ int main(int argc, char *argv[])
             if(val < 0) {
 				exit_error("[!] Receiving error for client...\n");
 			}
+
+
+			//TODO ** mesajul primit de la server va fi de tipul subscriber_message
+
             printf("mesaj primit de la server: %s\n", buffer);
             //trateaza situatia in care clientul incearca sa se conecteze cu un id_client deja existent
             /*if(strlen(buffer) >=4 && strncmp(buffer, "exit", 4) == 0){

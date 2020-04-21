@@ -10,9 +10,9 @@
 
 //structura care descrie un topic
 typedef struct topic {
-	char topic_name[51];
+	char topic_name[50];
 	int st; //1 sau 0
-} topic;
+} __attribute__((packed))topic;
 
 //structura care reprezinta un mesaj trimis de catre clientul TCP catre server
 //(mesaj de tipul subscribe/unsubscribe)
@@ -20,7 +20,7 @@ typedef struct client_request {
 	char request_type; //'u' pentru unsubscribe si 's' pentru subscribe
 	topic request_topic;
 	char client_id[11];//id_clientului care a facut cererea
-} client_request;
+} __attribute__((packed))client_request;
 
 //structura care descrie un client
 typedef struct client {
@@ -30,16 +30,23 @@ typedef struct client {
 	int connected; //1 - client online, 0 - client deconectat
 	int socket;
 	///TODO: buffer care retine topicurile pentru care este activat SF
-} client;
+} __attribute__((packed))client;
 
-//mesaj trimis de la server catre un client TCP
-typedef struct tcp_serv_message {
-	
-	char topic[51];
-	char id_client[11];
-	unsigned int data_type; //specifica tipul de date
-	char msg_value[1501]; //valoarea mesajului
-} tcp_serv_message;
+//structura care descrie un mesaj trimis de la server catre un client TCP
+typedef struct subscriber_message {
+	char topic_name[51];
+	char data_type[11]; //specifica tipul de date
+	char message[1501]; //valoarea mesajului
+	char ip_source[16]; //ip-ul clientului udp care a trimis un mesaj catre server
+	unsigned short client_port; //portul clientului udp care a trimis mesajul
+} __attribute__((packed))subscriber_message;
+
+//structura care descrie un mesaj pe care clientul UDP il trimite serverului
+typedef struct publisher_message {
+	char topic_name[50];
+	uint8_t data_type; //specifica tipul de date
+	char message[1501]; //valoarea mesajului
+} __attribute__((packed)) publisher_message;
 
 
 
