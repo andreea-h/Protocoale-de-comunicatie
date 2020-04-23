@@ -108,8 +108,9 @@ int remove_topic(char id_client[], char topic_name[]) {
 	return 1; //topicul a fost eliminat cu succes din lista topicurilor la care este abonat clientul
 }
 
-//intoarce 1 daca 'topic_name' exista in lista de topicuri 'topics_list' cu 'topics_nr' elemente
-//in caz contrar, intoarce 0
+//intoarce indicele corespunzator din lista de topicuri
+//(atunci cand 'topic_name' exista in lista de topicuri 'topics_list' cu 'topics_nr' elemente)
+//in caz contrar, intoarce -1 (topic nou)
 int find_topic_name(topic *topics_list, int topics_nr, char topic_name[]) {
 	int i;
 	if(topics_nr == 0) {
@@ -117,10 +118,10 @@ int find_topic_name(topic *topics_list, int topics_nr, char topic_name[]) {
 	}
 	for(i = 0; i < topics_nr; i++) {
 		if(strcmp(topics_list[i].topic_name, topic_name) == 0) {
-			return 1;
+			return i;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 //returneaza -1 in cazul in care formatul payload-ului din 'pub_message' este incorect
@@ -394,11 +395,11 @@ int main(int argc, char *argv[])
 					}
 					else { //id_client-ului nu este valid -> se va trimite catre client un mesaj
 						   //astfel incat clientul sa interpreteze eroarea din mesajul pe care acesta a intentionat sa il trimita catre server
-						server_response server_msg;
+						subscriber_message server_msg;
 						//char *msg = (char *)malloc(50 * sizeof(char));
-						strcpy(server_msg.error_message, "[!!!] Error...Client_ID already in use...\n");
-						server_msg.ok = 0;
-						ret = send(new_sock_fd, &server_msg, sizeof(server_response), 0);
+						strcpy(server_msg.message, "[!] This Client_ID is already in use! Try to use another Client_ID!\n");
+						
+						ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
 						if(ret < 0) {
 							exit_error("[!] Send error in server...\n");
 							exit(1);
@@ -481,7 +482,8 @@ int main(int argc, char *argv[])
                     	//TO DO COMPONENETA SF
                     	printf("client: %s\n", clients[i].id_client);
 
-                    	if(find_topic_name(clients[i].topics, clients[i].topics_nr, sub_message->topic_name) == 1
+                    	//clientul de la indexul 'i' este abonat la topic
+                    	if(find_topic_name(clients[i].topics, clients[i].topics_nr, sub_message->topic_name) != -1
                     		&& clients[i].connected == 1) { //clientul este conectat
                     		printf("client: %s\n", clients[i].id_client);
                     		int ret = send(clients[i].socket, sub_message, sizeof(subscriber_message), 0);
@@ -562,20 +564,56 @@ int main(int argc, char *argv[])
 						}
 						else if(client_msg.request_type == 's') {
 							printf("subscribe\n");
-							//TODO : trateaza situatia in care clientul cere sa se aboneze din nou la un topic la care s-a abonat deja
-							//adauga topicul in lista de topicuri la care clientul este abonat
-							topic new_topic;
-							strcpy(new_topic.topic_name, client_msg.request_topic.topic_name);
-							new_topic.st = client_msg.request_topic.st;
-							tcp_client->topics = (topic *)realloc(tcp_client->topics, (tcp_client->topics_nr + 2) * sizeof(topic));
-							tcp_client->topics[tcp_client->topics_nr++] = new_topic;
-							printf("********************** lista topicuri\n");
-							int l;
-							for(l = 0; l < tcp_client->topics_nr; l++) {
-								printf("topic_name: %s\n", tcp_client->topics[l].topic_name);
+							int check_topic = find_topic_name(tcp_client->topics, tcp_client->topics_nr, client_msg.request_topic.topic_name);
+							
+							//verifica daca clientul s-a mai abonat la acest topic
+							if(ckeck_topic != -1) {
+								//verifica daca valoarea pentru SF este una diferita
+								int old_sf = tcp_client->topics[check_topic].st;
+								int new_sf = client_msg.request_topic.sf;
+								if(new_sf != old_sf) { //modifica valoarea pentru sf si trimite un mesaj sugestiv catre client
+									tcp_client->topics[check_topic].st = client_msg.request_topic.sf;
+									subscriber_message server_msg;
+						
+									strcpy(server_msg.topic_name, tcp_client->topics[check_topic].topic_name);
+									strcpy(server_msg.message, "SF option updated successfully\n");
+									
+									ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
+									if(ret < 0) {
+										exit_error("[!] Send error in server...\n");
+										exit(1);
+									}
+								}
+								if(new_sf == old_sf) { //cerere de subscribe invalida
+									subscriber_message server_msg;
+						
+									strcpy(server_msg.topic_name, tcp_client->topics[check_topic].topic_name);
+									strcpy(server_msg.message, "[!] Subscribe error...You have already subscribed to this topic...\n");
+									
+									ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
+									if(ret < 0) {
+										exit_error("[!] Send error in server...\n");
+										exit(1);
+									}
+								}
 							}
 
-							printf("**********************\n");
+							else if(check_topic == -1) {
+								//adauga topicul in lista de topicuri la care clientul este abonat
+								topic new_topic;
+								strcpy(new_topic.topic_name, client_msg.request_topic.topic_name);
+								new_topic.st = client_msg.request_topic.st;
+								tcp_client->topics = (topic *)realloc(tcp_client->topics, (tcp_client->topics_nr + 2) * sizeof(topic));
+								tcp_client->topics[tcp_client->topics_nr++] = new_topic;
+								printf("********************** lista topicuri\n");
+								int l;
+								for(l = 0; l < tcp_client->topics_nr; l++) {
+									printf("topic_name: %s\n", tcp_client->topics[l].topic_name);
+								}
+
+								printf("**********************\n");
+								}
+								
 
 							//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
 							/*server_response response;

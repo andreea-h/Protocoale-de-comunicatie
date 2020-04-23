@@ -176,12 +176,17 @@ int main(int argc, char *argv[])
 			if(request.request_type == 's') {
 				//extrage valoarea pentru sf
 				token = strtok(NULL, " ");
-				
-				request_topic.st = atoi(token);
-				//verifica daca valoarea oferita la stdin pentru campul 'st' (in cazul comenzii 'subscribe') este cea corecta
-				if(request_topic.st != 0 && request_topic.st != 1) {
-					exit_error("[!] Wrong SF value! Values accepted: 0 or 1...\n");
-					continue;
+				if(strcmp(token, "0") == 0) {
+					request_topic.st = 0;
+				}
+				else {
+					request_topic.st = atoi(token);
+					printf("sotpic sf: %d\n", request_topic.st);
+					//verifica daca valoarea oferita la stdin pentru campul 'st' (in cazul comenzii 'subscribe') este cea corecta
+					if(request_topic.st != 1) {
+						exit_error("[!] Wrong SF value! Values accepted: 0 or 1...\n");
+						continue;
+					}
 				}
 			}
 			else { //comanda pentru unsubscribe are setata valoarea pentru st ('store') egala cu -1
@@ -264,6 +269,15 @@ int main(int argc, char *argv[])
             subscriber_message *client_msg = (subscriber_message *)malloc(1 * sizeof(subscriber_message));
             int val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
 
+            //verifica daca mesajul pe care il trimite serverul semnaleaza o eroare
+            char *check_msg = (char *)malloc(100 * sizeof(char));
+            memcpy(check_msg, client_msg.message, 100);
+            if(strcmp(check_msg, "[!] This Client_ID is already in use! Try to use another Client_ID!\n") == 0) {
+            	exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
+				close(sock_fd);
+				return 0;
+            }
+
             if(val < 0) {
 				exit_error("[!] Receiving error for client...\n");
 				continue;
@@ -273,6 +287,12 @@ int main(int argc, char *argv[])
             	//printf("Serverul a inchis conexiunea!\n");
             	break;
             } 
+
+            /*if(strlen(client_msg->message) == 0) {
+				exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
+				close(sock_fd);
+				return 0;
+			}*/
 
 			printf("%s:%hu - %s - %s - %s\n", client_msg->ip_source, client_msg->client_port, 
 				client_msg->topic_name, client_msg->data_type, client_msg->message);
