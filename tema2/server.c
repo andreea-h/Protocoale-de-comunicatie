@@ -352,6 +352,8 @@ int main(int argc, char *argv[])
 						clients[clients_nr].socket = new_sock_fd; //socketul pe care s-a acceptat conexiunea clientului cu serverul
 						clients[clients_nr].topics = (topic *)malloc(1 * sizeof(topic));
 						clients[clients_nr].topics_nr = 0;
+						clients[clients_nr].stored_messages = (subscriber_message *)malloc(sizeof(subscriber_message));
+						clients[clients_nr].stored = 0; 
 						clients_nr++;
 
 						char ip[INET_ADDRSTRLEN]; 
@@ -371,12 +373,10 @@ int main(int argc, char *argv[])
 							fd_max = new_sock_fd;
 						}
 						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
-						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
+						
 						subscriber_message server_msg;
 						strcpy(server_msg.message, "Available Client_Id.\n");
 						
-
-
 						ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
 						if(ret < 0) {
 							exit_error("[!] Send error in server...\n");
@@ -403,14 +403,29 @@ int main(int argc, char *argv[])
 
 						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
 						subscriber_message server_msg;
-						strcpy(server_msg.message, "Available Client_Id.\n");
+						strcpy(server_msg.message, "There are messages that need to be forwarded?\n");
 						
 						ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
 						if(ret < 0) {
 							exit_error("[!] Send error in server...\n");
 							exit(1);
 						}
-							
+						//trimite catre client mesajele stocate pentru forward
+						int c;
+						for(c = 0; c < current_client->stored; c++) {
+							ret = send(new_sock_fd, &(current_client->stored_messages[c]), sizeof(subscriber_message), 0);
+							if(ret < 0) {
+								exit_error("[!] Send error in server...\n");
+								exit(1);
+							}
+							//odata trimise mesajele, acestea vor fi eliminate din vector
+							int j;
+							for(j = c; j < current_client->stored; j++) {
+								current_client->stored_messages[j] = current_client->stored_messages[j + 1];
+							}
+							c--;
+							current_client->stored--;
+						}	
 					}
 					else { //id_client-ului nu este valid -> se va trimite catre client un mesaj
 						   //astfel incat clientul sa interpreteze eroarea din mesajul pe care acesta a intentionat sa il trimita catre server
@@ -509,8 +524,8 @@ int main(int argc, char *argv[])
                     	//printf("client: %s\n", clients[i].id_client);
 
                     	//clientul de la indexul 'i' este abonat la topic
-                    	if(find_topic_name(clients[i].topics, clients[i].topics_nr, sub_message->topic_name) != -1
-                    		&& clients[i].connected == 1) { //clientul este conectat
+                    	int pos = find_topic_name(clients[i].topics, clients[i].topics_nr, sub_message->topic_name);
+                    	if(pos != -1 && clients[i].connected == 1) { //clientul este conectat
                     		printf("client: %s\n", clients[i].id_client);
 
                     		int check = 1;
@@ -521,6 +536,13 @@ int main(int argc, char *argv[])
 								exit_error("[!] Send error...\n");
 								exit(1);
 							}
+                    	}
+                    	//clientul de la indexul 'i' este deconectat momentan
+                    	//dar abonat la topic avand SF == 1
+                    	else if(pos != -1 && clients[i].connected == 0 && clients[i].topics[pos].st == 1) {
+                    		clients[i].stored_messages = realloc(clients[i].stored_messages, (clients[i].stored + 1) * sizeof(subscriber_message));
+                    		memcpy(&clients[i].stored_messages[clients[i].stored], sub_message, sizeof(subscriber_message));
+                    		clients[i].stored++;
                     	}
                     }
 				}

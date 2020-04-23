@@ -105,7 +105,12 @@ int main(int argc, char *argv[])
         exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
 		close(sock_fd);
 		return 0;
-    }        
+    } 
+    //verifica daca mesajul trimis de server nu indica faptul ca clientul are de primit mesaje 
+    // stocate cat timp acesta era deconectat
+    if(strcmp(check_msg, "There are messages that need to be forwarded?\n") == 0) {
+    	printf("aici\n");
+    }    
 
 	while(1) {
 		tmp_fds = read_fds;
@@ -247,30 +252,6 @@ int main(int argc, char *argv[])
 			}
 		}
 		else {
-			/*
-			memset(buffer, 0, BUFLEN);
-
-			subscriber_message client_msg;
-            int val = recv(sock_fd, &client_msg, sizeof(subscriber_message), 0);
-            if(val < 0) {
-				exit_error("[!] Receiving error for client...\n");
-			}
-
-			printf("%s:%hu - %s - %s - %s\n", client_msg.ip_source, client_msg.client_port, 
-				client_msg.topic_name, client_msg.data_type, client_msg.message);
-
-          	//printf("mesaj primit de la server: %s\n", buffer);
-            //trateaza situatia in care clientul incearca sa se conecteze cu un id_client deja existent
-            
-            if(val == 0) {
-            	printf("Serverul a inchis conexiunea!\n");
-            	break;
-            }
-            if(strlen(buffer) >=8 && strncmp(buffer, "Problema", 8) == 0){
-            	break;
-            }
-            */
-
             memset(buffer, 0, BUFLEN);
 
             //subscriberul primeste notificare de la server pentru unul dintre topicurile la care este abonat
@@ -278,8 +259,6 @@ int main(int argc, char *argv[])
             int val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
 
             //verifica daca mesajul pe care il trimite serverul semnaleaza o eroare
-            
-
             if(val < 0) {
 				exit_error("[!] Receiving error for client...\n");
 				continue;

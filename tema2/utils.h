@@ -22,16 +22,6 @@ typedef struct client_request {
 	char client_id[11];//id_clientului care a facut cererea
 } __attribute__((packed))client_request;
 
-//structura care descrie un client
-typedef struct client {
-	char id_client[11]; //id unic asocit pentru fiecare client
-	topic *topics; //vector de structuri care retine topicurile la care este abonat clientul
-	int topics_nr; //numarul de topicuri la care este abonat clientul
-	int connected; //1 - client online, 0 - client deconectat
-	int socket;
-	///TODO: buffer care retine topicurile pentru care este activat SF
-} __attribute__((packed))client;
-
 //structura care descrie un mesaj trimis de la server catre un client TCP
 typedef struct subscriber_message {
 	char topic_name[51];
@@ -40,6 +30,17 @@ typedef struct subscriber_message {
 	char ip_source[16]; //ip-ul clientului udp care a trimis un mesaj catre server
 	unsigned short client_port; //portul clientului udp care a trimis mesajul
 } __attribute__((packed))subscriber_message;
+
+//structura care descrie un client
+typedef struct client {
+	char id_client[11]; //id unic asocit pentru fiecare client
+	topic *topics; //vector de structuri care retine topicurile la care este abonat clientul
+	int topics_nr; //numarul de topicuri la care este abonat clientul
+	int connected; //1 - client online, 0 - client deconectat
+	int socket;
+	subscriber_message *stored_messages; //retine mesajele trimise clientului cat timp acesta este deconectat
+	int stored; //numarul de mesaje stocate care urmeaza a fi trimise la reconectarea clientului
+} __attribute__((packed))client;
 
 //structura care descrie un mesaj pe care clientul UDP il trimite serverului
 typedef struct publisher_message {
