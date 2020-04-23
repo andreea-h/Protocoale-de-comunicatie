@@ -114,7 +114,7 @@ int remove_topic(char id_client[], char topic_name[]) {
 int find_topic_name(topic *topics_list, int topics_nr, char topic_name[]) {
 	int i;
 	if(topics_nr == 0) {
-		return 0;
+		return -1;
 	}
 	for(i = 0; i < topics_nr; i++) {
 		if(strcmp(topics_list[i].topic_name, topic_name) == 0) {
@@ -191,6 +191,10 @@ int extract_payload(publisher_message *pub_message, subscriber_message *sub_mess
 	}
 	else if(pub_message->data_type == 3) { //tipul STRING
 		sprintf(sub_message->message, "%s", pub_message->message);
+		printf("BEFORE: %s\n", pub_message->message);
+		//strncpy(sub_message->message, pub_message->message, strlen(pub_message->message) - 1);
+		//sub_message->message[strlen(sub_message->message)] = '\0';
+		printf("EXTRACTED: %s\n", sub_message->message);
 		return 1;
 	}
 	return -1;
@@ -367,9 +371,18 @@ int main(int argc, char *argv[])
 							fd_max = new_sock_fd;
 						}
 						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
-						/*server_response response;
-						response.ok = 1;
-						send(new_sock_fd, &response, sizeof(server_response), 0);*/
+						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
+						subscriber_message server_msg;
+						strcpy(server_msg.message, "Available Client_Id.\n");
+						
+
+
+						ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
+						if(ret < 0) {
+							exit_error("[!] Send error in server...\n");
+							exit(1);
+						}
+						
 					}
 					else if(check_client_unique(buff) == 0) { //s-a facut o cerere de reconectare
 					//	printf("RECONECTARE\n");
@@ -389,14 +402,19 @@ int main(int argc, char *argv[])
 						current_client->socket = new_sock_fd;
 
 						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
-						/*server_response response;
-						response.ok = 1;
-						send(new_sock_fd, &response, sizeof(server_response), 0);*/
+						subscriber_message server_msg;
+						strcpy(server_msg.message, "Available Client_Id.\n");
+						
+						ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
+						if(ret < 0) {
+							exit_error("[!] Send error in server...\n");
+							exit(1);
+						}
+							
 					}
 					else { //id_client-ului nu este valid -> se va trimite catre client un mesaj
 						   //astfel incat clientul sa interpreteze eroarea din mesajul pe care acesta a intentionat sa il trimita catre server
 						subscriber_message server_msg;
-						//char *msg = (char *)malloc(50 * sizeof(char));
 						strcpy(server_msg.message, "[!] This Client_ID is already in use! Try to use another Client_ID!\n");
 						
 						ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
@@ -408,11 +426,19 @@ int main(int argc, char *argv[])
 					}	
 				}
 				else if(i == pass_socket_udp) { //serverul va primi datagrame de la clienti udp
+
+					int check = 1;
+					setsockopt(i, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
+
 					socklen_t socklen;
 					
-					publisher_message pub_message; //memoreaza mesajul udp trimis la server de catre clientul upd
-
-					int rec = recvfrom(pass_socket_udp, &pub_message, sizeof(publisher_message), 0, (struct sockaddr *) &udp_sock, &socklen);
+					publisher_message *pub_message; //memoreaza mesajul udp trimis la server de catre clientul upd
+					pub_message = (publisher_message *)malloc(sizeof(publisher_message));
+					//int rec = recvfrom(pass_socket_udp, &pub_message, sizeof(publisher_message), 0, (struct sockaddr *) &udp_sock, &socklen);
+					
+					memset(buff, 0, BUFLEN);
+					int rec = recvfrom(pass_socket_udp, buff, BUFLEN, 0, (struct sockaddr *) &udp_sock, &socklen);
+					printf("buff: %s\n", buff);
 					if(rec < 0) {
 						exit_error("[!] Receiving error\n");
 						exit(1);
@@ -421,7 +447,7 @@ int main(int argc, char *argv[])
 					
 					//mesajul upd trebuie trimis mai departe catre clientii tcp abonati la topicul din mesaj
 					//formateaza mesajul udp primit
-				/*	char topic[51];
+					char topic[51];
 					strncpy(topic, buff, 50);
 					topic[50] = '\0';
 					printf("topic mesaj primit: %s\n", topic);
@@ -437,28 +463,28 @@ int main(int argc, char *argv[])
 					}
 
 					printf("mesaj: %s\n", msg);
-				*/	
+					memcpy(pub_message, buff, sizeof(publisher_message));
 					//se construieste mesajul tcp catre clienti pe baza mesajului upd primit
 					//'sub_message' retine mesajul trimis clientilor TCP de catre server
 					subscriber_message *sub_message = (subscriber_message *)malloc(sizeof(subscriber_message));
 					
-					strcpy(sub_message->topic_name, pub_message.topic_name);
-					if(pub_message.data_type == 0) {
+					strcpy(sub_message->topic_name, pub_message->topic_name);
+					if(pub_message->data_type == 0) {
 						strcpy(sub_message->data_type, "INT");
 					}
-					else if(pub_message.data_type == 1) {
+					else if(pub_message->data_type == 1) {
 						strcpy(sub_message->data_type, "SHORT_REAL");
 					}
-					else if(pub_message.data_type == 2) {
+					else if(pub_message->data_type == 2) {
 						strcpy(sub_message->data_type, "FLOAT");
 					}
-					else if(pub_message.data_type == 3) {
+					else if(pub_message->data_type == 3) {
 						strcpy(sub_message->data_type, "STRING");
 					}
 
 					//formateaza payload-ul mesajului care trebuie trimis de catre server
 					//completeaza campul 'sub_message.message' cu valoarea payloadului extras din 'pub_message'
-					int set_payload = extract_payload(&pub_message, sub_message);
+					int set_payload = extract_payload(pub_message, sub_message);
 					if(set_payload < 0) {
 						exit_error("[!] Payload format error...\n");
 						continue;
@@ -480,12 +506,16 @@ int main(int argc, char *argv[])
                     for(i = 0; i < clients_nr; i++) {
                     	//intoarce 1 daca topic_name exista in lista de topicuri la care este abonat clientul
                     	//TO DO COMPONENETA SF
-                    	printf("client: %s\n", clients[i].id_client);
+                    	//printf("client: %s\n", clients[i].id_client);
 
                     	//clientul de la indexul 'i' este abonat la topic
                     	if(find_topic_name(clients[i].topics, clients[i].topics_nr, sub_message->topic_name) != -1
                     		&& clients[i].connected == 1) { //clientul este conectat
                     		printf("client: %s\n", clients[i].id_client);
+
+                    		int check = 1;
+							setsockopt(clients[i].socket, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
+
                     		int ret = send(clients[i].socket, sub_message, sizeof(subscriber_message), 0);
                     		if(ret < 0) {
 								exit_error("[!] Send error...\n");
@@ -496,6 +526,8 @@ int main(int argc, char *argv[])
 				}
 
 				else {
+					int check = 1;
+					setsockopt(i, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
 					// s-au primit date pe unul din socketii de client,
 					// asa ca serverul trebuie sa le receptioneze
 					memset(buff, 0, BUFLEN);	
@@ -528,31 +560,31 @@ int main(int argc, char *argv[])
 						printf("type_req: %d\n", client_msg.request_topic.st);
 						printf("client_id: %s\n", client_msg.client_id);
 						if(client_msg.request_type == 'u') {
-							printf("AICI\n");
+							
 							//printf("unsubscribe\n");
 							//sterge topicul cu numele primit din lista topicurilor la care este abonat clientul
 							//functia 'remove_topic' intoarce -1 daca topicul nu este prezent in lista topicurilor la care este abonat clientul
 							int result = remove_topic(tcp_client->id_client, client_msg.request_topic.topic_name); 
 							if(result == -1) {
-								printf("aici not ok\n");
 								//trimite catre client un mesaj de eroare prin intermediul caruia clientul poate sa interpreteze problema 
 								//care a aparut in continutul datelor trimise catre server
-								/*server_response server_msg;
-								server_msg.ok = 0; //inputul oferit in client este invalid
-
-								strcpy(server_msg.error_message, "[!!!] Unsubscribe error! Topic not found as subscribed.\n");
-								ret = send(tcp_client->socket, &server_msg, sizeof(server_response), 0);
+								subscriber_message server_msg;
+								strcpy(server_msg.message, "[!] Invalid unsubscribe command! You are not subscribed to this topic!\n");
+								ret = send(i, &server_msg, sizeof(subscriber_message), 0);
 								if(ret < 0) {
 									exit_error("[!] Send error in server...\n");
 									exit(1);
-								}*/
+								}
 							}
-							/*else {
-								printf("aici ok\n");
-								server_response message;
-								message.ok = 1;
-								send(i, &message, sizeof(server_response), 0);
-							}*/
+							else {
+								subscriber_message server_msg;
+								strcpy(server_msg.message, "Successfully subscribed topic\n");
+								ret = send(i, &server_msg, sizeof(subscriber_message), 0);
+								if(ret < 0) {
+									exit_error("[!] Send error in server...\n");
+									exit(1);
+								}
+							}
 							printf("********************** lista topicuri\n");
 							int l;
 							for(l = 0; l < tcp_client->topics_nr; l++) {
@@ -567,18 +599,18 @@ int main(int argc, char *argv[])
 							int check_topic = find_topic_name(tcp_client->topics, tcp_client->topics_nr, client_msg.request_topic.topic_name);
 							
 							//verifica daca clientul s-a mai abonat la acest topic
-							if(ckeck_topic != -1) {
+							if(check_topic != -1) {
 								//verifica daca valoarea pentru SF este una diferita
 								int old_sf = tcp_client->topics[check_topic].st;
-								int new_sf = client_msg.request_topic.sf;
+								int new_sf = client_msg.request_topic.st;
 								if(new_sf != old_sf) { //modifica valoarea pentru sf si trimite un mesaj sugestiv catre client
-									tcp_client->topics[check_topic].st = client_msg.request_topic.sf;
+									tcp_client->topics[check_topic].st = client_msg.request_topic.st;
 									subscriber_message server_msg;
 						
 									strcpy(server_msg.topic_name, tcp_client->topics[check_topic].topic_name);
 									strcpy(server_msg.message, "SF option updated successfully\n");
 									
-									ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
+									ret = send(i, &server_msg, sizeof(subscriber_message), 0);
 									if(ret < 0) {
 										exit_error("[!] Send error in server...\n");
 										exit(1);
@@ -590,7 +622,7 @@ int main(int argc, char *argv[])
 									strcpy(server_msg.topic_name, tcp_client->topics[check_topic].topic_name);
 									strcpy(server_msg.message, "[!] Subscribe error...You have already subscribed to this topic...\n");
 									
-									ret = send(new_sock_fd, &server_msg, sizeof(subscriber_message), 0);
+									ret = send(i, &server_msg, sizeof(subscriber_message), 0);
 									if(ret < 0) {
 										exit_error("[!] Send error in server...\n");
 										exit(1);
@@ -612,32 +644,24 @@ int main(int argc, char *argv[])
 								}
 
 								printf("**********************\n");
-								}
-								
 
-							//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
-							/*server_response response;
-							response.ok = 1;
-							send(i, &response, sizeof(server_response), 0);*/
+								subscriber_message server_msg;
+						
+								strcpy(server_msg.topic_name, tcp_client->topics[check_topic].topic_name);
+								strcpy(server_msg.message, "Successfully subscribed topic\n");
+									
+								ret = send(i, &server_msg, sizeof(subscriber_message), 0);
+								if(ret < 0) {
+									exit_error("[!] Send error in server...\n");
+									exit(1);
+								}
+							}
 						}		
 					}
 				}
 			}
 		}
-
-	/*	int recv = recvfrom(pass_socket_udp, buff, BUFLEN, 0, (struct sockaddr *) &udp_sock, &socklen);
-		printf("am primit: %s\n", buff);
-		memset(buff, 0, BUFLEN);*/
 	}
-
-	
-	//inchide conexiunea cu toti clientii
-	//(trimite un mesaj de deconectare catre clienti)
-//	close_all_clients(read_fds, fd_max, pass_socket_tcp);
-
-//	close(pass_socket_tcp);
-//	close(pass_socket_udp);
-
 
 	return 0;
 }

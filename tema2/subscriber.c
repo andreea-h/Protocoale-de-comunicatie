@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <netinet/tcp.h>
 #include "utils.h"
 
 #define BUFLEN 1501
@@ -89,26 +90,23 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	//prin intermediul mesajului trimis de server dupa conectare, se verifica daca id_client este unul valid
-	//verifica daca mesajul primit de clientul tcp de la server semnaleaza o eroare 
-    //in acest mod se trateaza situatia in care clientul incearca sa se conecteze avand id_client acelasi cu cel al unui client deja conectat
- /*   server_response server_msg;
-    val = recv(sock_fd, &server_msg, sizeof(server_response), 0);
-    if(val < 0) {
-    	exit_error("[!] Receiving error in subscriber...\n");
-    	exit(1);
-    }
+	//dezactiveaza algoritmul lui Nagle
+	int check = 1;
+	setsockopt(sock_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
 
-    //id_client invalid
-    if(server_msg.ok == 0) {
-    	//printf("PROBLEM IN SUBSCRIBER\n");
-    	if(strcmp(server_msg.error_message, "[!!!] Error...Client_ID already in use...\n") == 0) {
-        	exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
- 			close(sock_fd);
- 			return 0;
-    	}
-    }
-    */
+	subscriber_message *client_msg = (subscriber_message *)malloc(1 * sizeof(subscriber_message));
+	val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
+
+    //verifica daca mesajul pe care il trimite serverul ca raspuns la cererea de conectare semnaleaza o eroare 
+    //in ceea ce priveste inputul la nivelul clientului
+    char *check_msg = (char *)malloc(100 * sizeof(char));
+    memcpy(check_msg, client_msg->message, 100);
+    if(strcmp(check_msg, "[!] This Client_ID is already in use! Try to use another Client_ID!\n") == 0) {
+        exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
+		close(sock_fd);
+		return 0;
+    }        
+
 	while(1) {
 		tmp_fds = read_fds;
 		val = select(fdmax + 1, &tmp_fds, NULL, NULL, NULL);
@@ -176,7 +174,7 @@ int main(int argc, char *argv[])
 			if(request.request_type == 's') {
 				//extrage valoarea pentru sf
 				token = strtok(NULL, " ");
-				if(strcmp(token, "0") == 0) {
+				if(strcmp(token, "0\n") == 0) {
 					request_topic.st = 0;
 				}
 				else {
@@ -212,23 +210,33 @@ int main(int argc, char *argv[])
 				continue;
 			}
 			
-		/*	//analizeaza raspunsul pe care il da serverul in aceasta situatie
-			server_response response;
-			int val = recv(sock_fd, &response, sizeof(server_response), 0);
-
-            if(val < 0) {
-				exit_error("[!] Receiving error for client...\n");
-				continue;
+			//analizeaza raspunsul pe care il da serverul in aceasta situatie
+			subscriber_message server_msg;
+			ret = recv(sock_fd, &server_msg, sizeof(subscriber_message), 0);
+			if(ret < 0) {
+				exit_error("[!] Send error in client...\n");
+				exit(1);
 			}
-			//daca inputul nu este in concordanta cu comenzile date pana acum
-			//se afiseaza un mesaj de eroare la stdout
-			if(response.ok == 0) { 
-				//daca se da unsubscribe pentru un topic la care clientul nu s-a abonat, se va afisa un mesaj de eroare
-				if(strcmp(response.error_message, "[!!!] Unsubscribe error! Topic not found as subscribed.\n") == 0) {
-					exit_error(response.error_message);
+
+			//verifica raspunsul de la server in functie de tipul de cerere care a fost trimisa
+			if(request.request_type == 's') {
+				if(strcmp(server_msg.message, "SF option updated successfully\n") == 0) {
+					printf("SF option updated successfully\n");
 					continue;
 				}
-			}*/
+				else if(strcmp(server_msg.message, "[!] Subscribe error...You have already subscribed to this topic...\n") == 0) {
+					printf("[!] Subscribe error...You have already subscribed to this topic...\n");
+					continue;
+				}
+			}
+			if(request.request_type == 'u') {
+				//verifica prin mesajul primit de la client daca s-a trimis o comanda valida de unsubscribe
+				if(strcmp(server_msg.message, "[!] Invalid unsubscribe command! You are not subscribed to this topic!\n") == 0) {
+					printf("[!] Invalid unsubscribe command! You are not subscribed to this topic!\n");
+					continue;
+				}
+			}
+	
 			//afiseaza feedback pentru comanda tocmai trimisa catre server de catre client 
 			//daca aceasta a fost acceptata cu succes de catre server
 			if(request.request_type == 's') {
@@ -270,13 +278,7 @@ int main(int argc, char *argv[])
             int val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
 
             //verifica daca mesajul pe care il trimite serverul semnaleaza o eroare
-            char *check_msg = (char *)malloc(100 * sizeof(char));
-            memcpy(check_msg, client_msg.message, 100);
-            if(strcmp(check_msg, "[!] This Client_ID is already in use! Try to use another Client_ID!\n") == 0) {
-            	exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
-				close(sock_fd);
-				return 0;
-            }
+            
 
             if(val < 0) {
 				exit_error("[!] Receiving error for client...\n");
