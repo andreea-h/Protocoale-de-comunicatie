@@ -48,5 +48,10 @@ typedef struct publisher_message {
 	char message[1501]; //valoarea mesajului
 } __attribute__((packed)) publisher_message;
 
-
+//structura folosita pentru a trimite de la server catre clientii tcp feedback 
+//pentru comenzile 'subscribe', 'unsubscribe' si pentru conectarea unui client nou
+typedef struct server_response {
+	int ok; //1 - cererea clientului a fost prelucrata cu succes la nivelul serverului, 0 - input-ul dat de client este eronat
+	char error_message[60]; //mesajul de eroare trimis de catre server
+} __attribute__((packed))server_response;
 

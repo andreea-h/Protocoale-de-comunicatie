@@ -25,9 +25,8 @@ void usage(char *file)
 	exit(0);
 }
 
-int exit_error(char *string_error) {
+void exit_error(char *string_error) {
 	printf("%s", string_error);
-	perror(string_error);
 }
 
 int main(int argc, char *argv[]) 
@@ -53,6 +52,7 @@ int main(int argc, char *argv[])
 	sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sock_fd < 0) {
 		exit_error("[!] Socket open error...\n");
+		exit(1);
 	}
 
 	FD_SET(sock_fd, &read_fds);
@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     int port_nr = atoi(argv[3]);
     if(port_nr == 0) {
     	exit_error("[!] Data converting error...\n");
+    	exit(1);
     }
 	sock_addr.sin_family = AF_INET;
 	sock_addr.sin_port = htons(port_nr);
@@ -71,50 +72,70 @@ int main(int argc, char *argv[])
 
 	if(ret == 0) {
 		exit_error("[!] Data converting error...\n");
+		exit(1);
 	}
-
-	//printf("adresa ip: %d\n", sock_addr.sin_addr.s_addr);
 
 	val = connect(sock_fd, (struct sockaddr*) &sock_addr, sizeof(sock_addr));
 	//imediat ce subscriber-ul s-a conectat la server, se trimite catre server si Client_ID aferent acestuia
 	if(val < 0) {
 		exit_error("[!] Connect error for client...\n");
+		exit(1);
 	}
 
+	//subscriber-ul trimite catre server, imediat dupa stabilirea conexiunii, client_id-ul cu care a fost pornit
 	ret = send(sock_fd, argv[1], strlen(argv[1]), 0);
 	if(ret < 0) {
 		exit_error("[!] Send error for client...\n");
+		exit(1);
 	}
 
-//	printf("port: %hu\n", sock_addr.sin_port);
+	//prin intermediul mesajului trimis de server dupa conectare, se verifica daca id_client este unul valid
+	//verifica daca mesajul primit de clientul tcp de la server semnaleaza o eroare 
+    //in acest mod se trateaza situatia in care clientul incearca sa se conecteze avand id_client acelasi cu cel al unui client deja conectat
+ /*   server_response server_msg;
+    val = recv(sock_fd, &server_msg, sizeof(server_response), 0);
+    if(val < 0) {
+    	exit_error("[!] Receiving error in subscriber...\n");
+    	exit(1);
+    }
 
+    //id_client invalid
+    if(server_msg.ok == 0) {
+    	//printf("PROBLEM IN SUBSCRIBER\n");
+    	if(strcmp(server_msg.error_message, "[!!!] Error...Client_ID already in use...\n") == 0) {
+        	exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
+ 			close(sock_fd);
+ 			return 0;
+    	}
+    }
+    */
 	while(1) {
 		tmp_fds = read_fds;
 		val = select(fdmax + 1, &tmp_fds, NULL, NULL, NULL);
 		if(val < 0) {
 			exit_error("[!] Connection error in client...\n");
+			exit(1);
 		}
 
 		if (FD_ISSET(0, &tmp_fds)) { 
 	        
 	        //se va citi de la tastatura mesajul pe care subscriber doreste sa il trimita catre server
 	        memset(buffer, 0, BUFLEN);
-
 			fgets(buffer, BUFLEN - 1, stdin);
 	        
 			if (strcmp(buffer, "exit\n") == 0) {
 				break;
 			}
 
-			//TODO verifica formatul pentru mesajul trimis de client:
-			//valori corect pentru componenta sf?
-
 			//verifica daca comanda pe care o trimite clientul catre server respecta formatul enuntat
+			//in caz de input incorect, este afisat un mesaj de eroare adresat clientului
 			char *buff_temp = (char *)malloc(BUFLEN * sizeof(char));
 			strcpy(buff_temp, buffer);
-			int nr_params = 1;
+			int nr_params = 1; //nr de parametri din comanda preluata de la stdin
+
 			char *tmp_token = strtok(buff_temp, " ");
 			printf("fst_token: %s\n", tmp_token);
+
 			if(strcmp(tmp_token, "subscribe") != 0 && strcmp(tmp_token, "unsubscribe") != 0) {
 				printf("[!] Wrong format. Correct usage: \"subscribe <topic_name> <SF>\" or  \"unsubscribe <topic_name>\" or \"exit\"\n");
 				continue;
@@ -148,7 +169,8 @@ int main(int argc, char *argv[])
 			}
 
 			token = strtok(NULL, " ");
-			//extrage topicul
+			//extrage numele topicului
+			printf("token: %s\n", token);
 			strcpy(request_topic.topic_name, token);
 
 			if(request.request_type == 's') {
@@ -156,25 +178,54 @@ int main(int argc, char *argv[])
 				token = strtok(NULL, " ");
 				
 				request_topic.st = atoi(token);
+				//verifica daca valoarea oferita la stdin pentru campul 'st' (in cazul comenzii 'subscribe') este cea corecta
+				if(request_topic.st != 0 && request_topic.st != 1) {
+					exit_error("[!] Wrong SF value! Values accepted: 0 or 1...\n");
+					continue;
+				}
 			}
-			else { //comanda pentru unsubscribe are setata valoarea pentru st egala cu -1
+			else { //comanda pentru unsubscribe are setata valoarea pentru st ('store') egala cu -1
+				
 				request_topic.st = -1;
 				//ultimul caracter din nume_topic pentru input corect, in cazul unsubscribe este '\n'
-				//este inlocuit ultimul caracter din topic cu '\0'
+				//este inlocuit ultimul caracter din topic cu aracterul '\0'
 				request_topic.topic_name[strlen(request_topic.topic_name) - 1] = '\0';
 			}
 			
-			
 			strcpy(request.client_id, argv[1]);
+			printf("argv[1] %s\n", argv[1]);
+			printf("id_client: %s\n", request.client_id);
 			request.request_topic = request_topic;
 
+			printf("client: %s\n", request.client_id);
+			printf("topic_name: %s\n", request.request_topic.topic_name);
+
 			// se trimite mesaj la server
-			int sending1 = send(sock_fd, &request, sizeof(request), 0);
+			int sending1 = send(sock_fd, &request, sizeof(client_request), 0);
 			if(sending1 < 0) {
 				exit_error("[!] Send error for client...\n");
 				continue;
 			}
-			//afiseaza feedback pentru comanda tocmai trimisa catre server de catre client
+			
+		/*	//analizeaza raspunsul pe care il da serverul in aceasta situatie
+			server_response response;
+			int val = recv(sock_fd, &response, sizeof(server_response), 0);
+
+            if(val < 0) {
+				exit_error("[!] Receiving error for client...\n");
+				continue;
+			}
+			//daca inputul nu este in concordanta cu comenzile date pana acum
+			//se afiseaza un mesaj de eroare la stdout
+			if(response.ok == 0) { 
+				//daca se da unsubscribe pentru un topic la care clientul nu s-a abonat, se va afisa un mesaj de eroare
+				if(strcmp(response.error_message, "[!!!] Unsubscribe error! Topic not found as subscribed.\n") == 0) {
+					exit_error(response.error_message);
+					continue;
+				}
+			}*/
+			//afiseaza feedback pentru comanda tocmai trimisa catre server de catre client 
+			//daca aceasta a fost acceptata cu succes de catre server
 			if(request.request_type == 's') {
 				printf("subscribed %s\n", request_topic.topic_name);
 			}
@@ -183,20 +234,21 @@ int main(int argc, char *argv[])
 			}
 		}
 		else {
+			/*
 			memset(buffer, 0, BUFLEN);
-            int val = recv(sock_fd, buffer, BUFLEN, 0);
+
+			subscriber_message client_msg;
+            int val = recv(sock_fd, &client_msg, sizeof(subscriber_message), 0);
             if(val < 0) {
 				exit_error("[!] Receiving error for client...\n");
 			}
 
+			printf("%s:%hu - %s - %s - %s\n", client_msg.ip_source, client_msg.client_port, 
+				client_msg.topic_name, client_msg.data_type, client_msg.message);
 
-			//TODO ** mesajul primit de la server va fi de tipul subscriber_message
-
-            printf("mesaj primit de la server: %s\n", buffer);
+          	//printf("mesaj primit de la server: %s\n", buffer);
             //trateaza situatia in care clientul incearca sa se conecteze cu un id_client deja existent
-            /*if(strlen(buffer) >=4 && strncmp(buffer, "exit", 4) == 0){
-            	break;
-            }*/
+            
             if(val == 0) {
             	printf("Serverul a inchis conexiunea!\n");
             	break;
@@ -204,6 +256,26 @@ int main(int argc, char *argv[])
             if(strlen(buffer) >=8 && strncmp(buffer, "Problema", 8) == 0){
             	break;
             }
+            */
+
+            memset(buffer, 0, BUFLEN);
+
+            //subscriberul primeste notificare de la server pentru unul dintre topicurile la care este abonat
+            subscriber_message *client_msg = (subscriber_message *)malloc(1 * sizeof(subscriber_message));
+            int val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
+
+            if(val < 0) {
+				exit_error("[!] Receiving error for client...\n");
+				continue;
+			}
+
+            if(val == 0) {
+            	//printf("Serverul a inchis conexiunea!\n");
+            	break;
+            } 
+
+			printf("%s:%hu - %s - %s - %s\n", client_msg->ip_source, client_msg->client_port, 
+				client_msg->topic_name, client_msg->data_type, client_msg->message);
 		}
 	}
 	

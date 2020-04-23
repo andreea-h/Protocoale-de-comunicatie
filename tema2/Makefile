@@ -3,7 +3,7 @@ IP_ADDR=127.0.0.1
 
 build:
 	gcc publisher.c -o publisher
-	gcc server.c -o server
+	gcc server.c -o server -lm
 	gcc subscriber.c -o subscriber
 run_publisher:
 	./publisher ${IP_ADDR} ${PORT}
