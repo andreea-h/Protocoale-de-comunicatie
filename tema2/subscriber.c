@@ -86,18 +86,21 @@ int main(int argc, char *argv[])
 	int check = 1;
 	setsockopt(sock_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
 
-	subscriber_message *client_msg = (subscriber_message *)malloc(1 * sizeof(subscriber_message));
+	subscriber_message *client_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
 	val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
 
     //verifica daca mesajul pe care il trimite serverul ca raspuns la cererea de conectare semnaleaza o eroare 
     //in ceea ce priveste inputul la nivelul clientului
-    char *check_msg = (char *)malloc(100 * sizeof(char));
+    char *check_msg = (char *)calloc(100, sizeof(char));
     memcpy(check_msg, client_msg->message, 100);
     if(strcmp(check_msg, "[!] This Client_ID is already in use! Try to use another Client_ID!\n") == 0) {
         exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
 		close(sock_fd);
 		return 0;
     } 
+
+    free(client_msg);
+    free(check_msg);
    
 	while(1) {
 		tmp_fds = read_fds;
@@ -119,7 +122,7 @@ int main(int argc, char *argv[])
 
 			//verifica daca comanda pe care o trimite clientul catre server respecta formatul enuntat
 			//in caz de input incorect, este afisat un mesaj de eroare adresat clientului
-			char *buff_temp = (char *)malloc(BUFLEN * sizeof(char));
+			char *buff_temp = (char *)calloc(BUFLEN, sizeof(char));
 			strcpy(buff_temp, buffer);
 			int nr_params = 1; //nr de parametri din comanda preluata de la stdin
 
@@ -141,24 +144,24 @@ int main(int argc, char *argv[])
 			}
 
 			//daca comanda are formatul valid, se va trimite cererea aferenta catre server
-			client_request request;
+			client_request *request = (client_request *)calloc(1, sizeof(client_request));
 			topic request_topic;
 
 			//extrage din 'buff' topicul, respectiv tipul de cerere trimisa (subscribe/unsubscribe)
 			//si valoarea pentru sf (1/0)
 			char *token = strtok(buffer, " ");
 			if(token[0] == 's') {
-				request.request_type = 's';
+				request->request_type = 's';
 			}
 			else if(token[0] == 'u') {
-				request.request_type = 'u';
+				request->request_type = 'u';
 			}
 
 			token = strtok(NULL, " ");
 			//extrage numele topicului
 			strcpy(request_topic.topic_name, token);
 
-			if(request.request_type == 's') {
+			if(request->request_type == 's') {
 				//extrage valoarea pentru sf
 				token = strtok(NULL, " ");
 				if(strcmp(token, "0\n") == 0) {
@@ -180,10 +183,10 @@ int main(int argc, char *argv[])
 				request_topic.topic_name[strlen(request_topic.topic_name) - 1] = '\0';
 			}
 			
-			strcpy(request.client_id, argv[1]);
-			request.request_topic = request_topic;
+			strcpy(request->client_id, argv[1]);
+			request->request_topic = request_topic;
 			// se trimite mesaj la server
-			int sending1 = send(sock_fd, &request, sizeof(client_request), 0);
+			int sending1 = send(sock_fd, request, sizeof(client_request), 0);
 			if(sending1 < 0) {
 				exit_error("[!] Send error for client...\n");
 				continue;
@@ -198,7 +201,7 @@ int main(int argc, char *argv[])
 			}
 
 			//verifica raspunsul de la server in functie de tipul de cerere care a fost trimisa
-			if(request.request_type == 's') {
+			if(request->request_type == 's') {
 				if(strcmp(server_msg.message, "SF option updated successfully\n") == 0) {
 					printf("SF option updated successfully\n");
 					continue;
@@ -208,7 +211,7 @@ int main(int argc, char *argv[])
 					continue;
 				}
 			}
-			if(request.request_type == 'u') {
+			if(request->request_type == 'u') {
 				//verifica prin mesajul primit de la client daca s-a trimis o comanda valida de unsubscribe
 				if(strcmp(server_msg.message, "[!] Invalid unsubscribe command! You are not subscribed to this topic!\n") == 0) {
 					printf("[!] Invalid unsubscribe command! You are not subscribed to this topic!\n");
@@ -217,18 +220,20 @@ int main(int argc, char *argv[])
 			}
 			//afiseaza feedback pentru comanda tocmai trimisa catre server de catre client 
 			//daca aceasta a fost acceptata cu succes de catre server
-			if(request.request_type == 's') {
+			if(request->request_type == 's') {
 				printf("subscribed %s\n", request_topic.topic_name);
 			}
-			else if(request.request_type == 'u') {
+			else if(request->request_type == 'u') {
 				printf("unsubscribed %s\n", request_topic.topic_name);
 			}
+			free(request);
+			free(buff_temp);
 		}
 		else {
             memset(buffer, 0, BUFLEN);
 
             //subscriberul primeste notificare de la server pentru unul dintre topicurile la care este abonat
-            subscriber_message *client_msg = (subscriber_message *)malloc(1 * sizeof(subscriber_message));
+            subscriber_message *client_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
             int val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
 
             //verifica daca mesajul pe care il trimite serverul semnaleaza o eroare
@@ -238,10 +243,22 @@ int main(int argc, char *argv[])
 			}
 
             if(val == 0) { //serverul a inchis conexiunea
+            	free(client_msg);
             	break;
             } 
+
+            if(strcmp(client_msg->message, "There are messages that need to be forwarded?\n") == 0) {
+            	continue;
+            }
+
+            if(strcmp(client_msg->message, "Available Client_Id.\n") == 0) {
+            	continue;
+            }
+
 			printf("%s:%hu - %s - %s - %s\n", client_msg->ip_source, client_msg->client_port, 
 				client_msg->topic_name, client_msg->data_type, client_msg->message);
+
+			free(client_msg);
 		}
 	}
 	

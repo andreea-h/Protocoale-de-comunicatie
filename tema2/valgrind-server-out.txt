@@ -1,323 +1,136 @@
-==18344== Memcheck, a memory error detector
-==18344== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==18344== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==18344== Command: ./server 8080
-==18344== Parent PID: 18343
-==18344== 
---18344-- 
---18344-- Valgrind options:
---18344--    --leak-check=full
---18344--    --show-leak-kinds=all
---18344--    --track-origins=yes
---18344--    --verbose
---18344--    --log-file=valgrind-server-out.txt
---18344-- Contents of /proc/version:
---18344--   Linux version 4.15.0-96-generic (buildd@lgw01-amd64-004) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #97-Ubuntu SMP Wed Apr 1 03:25:46 UTC 2020
---18344-- 
---18344-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
---18344-- Page sizes: currently 4096, max supported 4096
---18344-- Valgrind library directory: /usr/lib/valgrind
---18344-- Reading syms from /home/andreea/Desktop/PROTOCOALE/tema2/server
---18344-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
---18344--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
---18344--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
---18344--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
---18344--   .. CRC is valid
---18344-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
---18344--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
---18344--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
---18344--    object doesn't have a symbol table
---18344--    object doesn't have a dynamic symbol table
---18344-- Scheduler: using generic scheduler lock implementation.
---18344-- Reading suppressions file: /usr/lib/valgrind/default.supp
-==18344== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-18344-by-andreea-on-???
-==18344== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-18344-by-andreea-on-???
-==18344== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-18344-by-andreea-on-???
-==18344== 
-==18344== TO CONTROL THIS PROCESS USING vgdb (which you probably
-==18344== don't want to do, unless you know exactly what you're doing,
-==18344== or are doing some strange experiment):
-==18344==   /usr/lib/valgrind/../../bin/vgdb --pid=18344 ...command...
-==18344== 
-==18344== TO DEBUG THIS PROCESS USING GDB: start GDB like this
-==18344==   /path/to/gdb ./server
-==18344== and then give GDB the following command
-==18344==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=18344
-==18344== --pid is optional if only one valgrind process is running
-==18344== 
---18344-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
---18344-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
---18344-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
---18344--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
---18344--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
---18344--    object doesn't have a symbol table
---18344-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
---18344--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
---18344--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
---18344--    object doesn't have a symbol table
-==18344== WARNING: new redirection conflicts with existing -- ignoring it
---18344--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x580608c1 ???
---18344--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
---18344-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
---18344-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
---18344-- Reading syms from /lib/x86_64-linux-gnu/libm-2.27.so
---18344--   Considering /lib/x86_64-linux-gnu/libm-2.27.so ..
---18344--   .. CRC mismatch (computed 7feae033 wanted b29b2508)
---18344--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libm-2.27.so ..
---18344--   .. CRC is valid
---18344-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
---18344--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
---18344--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
---18344--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
---18344--   .. CRC is valid
---18344-- REDIR: 0x5278c70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278f50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x527a7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278de0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278c10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278d40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x52960f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278fa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x52790e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x52777c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5277c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x52826c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278ff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278be0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5296eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278f20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5278ef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x527a7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x5279040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---18344-- REDIR: 0x53683c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
---18344-- REDIR: 0x5368f50 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4c365d0 (memset)
---18344-- REDIR: 0x5271070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
-==18344== Conditional jump or move depends on uninitialised value(s)
-==18344==    at 0x109C3B: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
---18344-- REDIR: 0x5272c30 (libc.so.6:realloc) redirected to 0x4c31cb0 (realloc)
---18344-- REDIR: 0x5355950 (libc.so.6:__strcpy_ssse3) redirected to 0x4c32dd0 (strcpy)
---18344-- REDIR: 0x53681d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
---18344-- REDIR: 0x5368590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
---18344-- REDIR: 0x5368ab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10A105: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x1ffefff0a0 is on thread 1's stack
-==18344==  in frame #1, created by main (???:)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== Invalid read of size 1
-==18344==    at 0x5355950: __strcpy_ssse3 (strcpy-ssse3.S:32)
-==18344==    by 0x10B1F8: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x55cbc1a is 10 bytes after a block of size 1,024 alloc'd
-==18344==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x525818B: _IO_file_doallocate (filedoalloc.c:101)
-==18344==    by 0x5268378: _IO_doallocbuf (genops.c:365)
-==18344==    by 0x5267497: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:759)
-==18344==    by 0x52659EC: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1266)
-==18344==    by 0x5235533: vfprintf (vfprintf.c:1328)
-==18344==    by 0x523EF25: printf (printf.c:33)
-==18344==    by 0x10A04D: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10B25B: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x1ffefff55f is on thread 1's stack
-==18344==  in frame #1, created by main (???:)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
---18344-- REDIR: 0x5343d60 (libc.so.6:__strcmp_ssse3) redirected to 0x4c33da0 (strcmp)
---18344-- REDIR: 0x5368ad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
-==18344== Conditional jump or move depends on uninitialised value(s)
-==18344==    at 0x4C32E08: strcpy (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10975D: extract_payload (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==    by 0x10A6CF: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109780: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10A2A0: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x1ffefff55f is on thread 1's stack
-==18344==  in frame #1, created by main (???:)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10A309: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x6dcb048 is 8 bytes inside a block of size 3,626,814 alloc'd
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A9FE: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== Invalid read of size 8
-==18344==    at 0x10A387: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x714077e is 0 bytes after a block of size 3,626,814 alloc'd
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A9FE: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== Invalid read of size 8
-==18344==    at 0x10A39F: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x7140da3 is 1,507 bytes inside an unallocated block of size 444,272 in arena "client"
-==18344== 
-==18344== Invalid read of size 8
-==18344==    at 0x10A3C7: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x7140785 is 7 bytes after a block of size 3,626,814 alloc'd
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A9FE: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
---18344-- REDIR: 0x5364420 (libc.so.6:__memchr_avx2) redirected to 0x4c33f80 (memchr)
---18344-- REDIR: 0x5271950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
-==18344== 
-==18344== HEAP SUMMARY:
-==18344==     in use at exit: 13,182,191 bytes in 9,144 blocks
-==18344==   total heap usage: 11,786 allocs, 2,642 frees, 4,267,685,483 bytes allocated
-==18344== 
-==18344== Searching for pointers to 9,144 not-freed blocks
-==18344== Checked 74,560 bytes
-==18344== 
-==18344== 22 bytes in 2 blocks are definitely lost in loss record 1 of 7
-==18344==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10AB8C: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 43 bytes in 1 blocks are still reachable in loss record 2 of 7
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x109E5A: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 162 bytes in 1 blocks are definitely lost in loss record 3 of 7
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10B113: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 4,292 bytes in 1,073 blocks are definitely lost in loss record 4 of 7
-==18344==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x109513: extract_payload (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==    by 0x10A6CF: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 542,283 bytes in 1 blocks are definitely lost in loss record 5 of 7
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A9FE: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 6,259,216 bytes in 4,033 blocks are definitely lost in loss record 6 of 7
-==18344==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A54D: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 6,376,173 bytes in 4,033 blocks are definitely lost in loss record 7 of 7
-==18344==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A5EC: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== LEAK SUMMARY:
-==18344==    definitely lost: 13,182,148 bytes in 9,143 blocks
-==18344==    indirectly lost: 0 bytes in 0 blocks
-==18344==      possibly lost: 0 bytes in 0 blocks
-==18344==    still reachable: 43 bytes in 1 blocks
-==18344==         suppressed: 0 bytes in 0 blocks
-==18344== 
-==18344== ERROR SUMMARY: 3346 errors from 16 contexts (suppressed: 0 from 0)
-==18344== 
-==18344== 1 errors in context 1 of 16:
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10A105: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x1ffefff0a0 is on thread 1's stack
-==18344==  in frame #1, created by main (???:)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 2 errors in context 2 of 16:
-==18344== Invalid read of size 8
-==18344==    at 0x10A39F: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x7140da3 is 1,507 bytes inside an unallocated block of size 444,272 in arena "client"
-==18344== 
-==18344== 
-==18344== 2 errors in context 3 of 16:
-==18344== Invalid read of size 8
-==18344==    at 0x10A387: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x714077e is 0 bytes after a block of size 3,626,814 alloc'd
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A9FE: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 2 errors in context 4 of 16:
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10A2A0: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x1ffefff55f is on thread 1's stack
-==18344==  in frame #1, created by main (???:)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 2 errors in context 5 of 16:
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10B25B: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x1ffefff55f is on thread 1's stack
-==18344==  in frame #1, created by main (???:)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 2 errors in context 6 of 16:
-==18344== Invalid read of size 1
-==18344==    at 0x5355950: __strcpy_ssse3 (strcpy-ssse3.S:32)
-==18344==    by 0x10B1F8: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x55cbc1a is 10 bytes after a block of size 1,024 alloc'd
-==18344==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x525818B: _IO_file_doallocate (filedoalloc.c:101)
-==18344==    by 0x5268378: _IO_doallocbuf (genops.c:365)
-==18344==    by 0x5267497: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:759)
-==18344==    by 0x52659EC: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1266)
-==18344==    by 0x5235533: vfprintf (vfprintf.c:1328)
-==18344==    by 0x523EF25: printf (printf.c:33)
-==18344==    by 0x10A04D: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 7 errors in context 7 of 16:
-==18344== Conditional jump or move depends on uninitialised value(s)
-==18344==    at 0x109C3B: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109785: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 292 errors in context 8 of 16:
-==18344== Conditional jump or move depends on uninitialised value(s)
-==18344==    at 0x4C32E08: strcpy (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10975D: extract_payload (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==    by 0x10A6CF: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Uninitialised value was created by a stack allocation
-==18344==    at 0x109780: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 393 errors in context 9 of 16:
-==18344== Invalid read of size 8
-==18344==    at 0x10A3C7: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x7140785 is 7 bytes after a block of size 3,626,814 alloc'd
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A9FE: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== 
-==18344== 2637 errors in context 10 of 16:
-==18344== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==18344==    at 0x52FCC4D: send (send.c:28)
-==18344==    by 0x10A309: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344==  Address 0x6dcb048 is 8 bytes inside a block of size 3,626,814 alloc'd
-==18344==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18344==    by 0x10A9FE: main (in /home/andreea/Desktop/PROTOCOALE/tema2/server)
-==18344== 
-==18344== ERROR SUMMARY: 3346 errors from 16 contexts (suppressed: 0 from 0)
+==30313== Memcheck, a memory error detector
+==30313== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==30313== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==30313== Command: ./server 8080
+==30313== Parent PID: 30312
+==30313== 
+--30313-- 
+--30313-- Valgrind options:
+--30313--    --leak-check=full
+--30313--    --show-leak-kinds=all
+--30313--    --track-origins=yes
+--30313--    --verbose
+--30313--    --tool=memcheck
+--30313--    --log-file=valgrind-server-out.txt
+--30313-- Contents of /proc/version:
+--30313--   Linux version 4.15.0-96-generic (buildd@lgw01-amd64-004) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #97-Ubuntu SMP Wed Apr 1 03:25:46 UTC 2020
+--30313-- 
+--30313-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--30313-- Page sizes: currently 4096, max supported 4096
+--30313-- Valgrind library directory: /usr/lib/valgrind
+--30313-- Reading syms from /home/andreea/Desktop/PROTOCOALE/tema2/server
+--30313-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
+--30313--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
+--30313--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
+--30313--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
+--30313--   .. CRC is valid
+--30313-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--30313--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--30313--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
+--30313--    object doesn't have a symbol table
+--30313--    object doesn't have a dynamic symbol table
+--30313-- Scheduler: using generic scheduler lock implementation.
+--30313-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==30313== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-30313-by-andreea-on-???
+==30313== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-30313-by-andreea-on-???
+==30313== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-30313-by-andreea-on-???
+==30313== 
+==30313== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==30313== don't want to do, unless you know exactly what you're doing,
+==30313== or are doing some strange experiment):
+==30313==   /usr/lib/valgrind/../../bin/vgdb --pid=30313 ...command...
+==30313== 
+==30313== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==30313==   /path/to/gdb ./server
+==30313== and then give GDB the following command
+==30313==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=30313
+==30313== --pid is optional if only one valgrind process is running
+==30313== 
+--30313-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
+--30313-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
+--30313-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--30313--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--30313--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
+--30313--    object doesn't have a symbol table
+--30313-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--30313--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--30313--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
+--30313--    object doesn't have a symbol table
+==30313== WARNING: new redirection conflicts with existing -- ignoring it
+--30313--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x580608c1 ???
+--30313--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
+--30313-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
+--30313-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
+--30313-- Reading syms from /lib/x86_64-linux-gnu/libm-2.27.so
+--30313--   Considering /lib/x86_64-linux-gnu/libm-2.27.so ..
+--30313--   .. CRC mismatch (computed 7feae033 wanted b29b2508)
+--30313--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libm-2.27.so ..
+--30313--   .. CRC is valid
+--30313-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
+--30313--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
+--30313--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
+--30313--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
+--30313--   .. CRC is valid
+--30313-- REDIR: 0x5278c70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278f50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x527a7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278de0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278c10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278d40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x52960f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278fa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x52790e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x52777c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5277c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x52826c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278ff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278be0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5296eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278f20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5278ef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x527a7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x5279040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--30313-- REDIR: 0x53683c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
+--30313-- REDIR: 0x5368f50 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4c365d0 (memset)
+--30313-- REDIR: 0x5274030 (libc.so.6:calloc) redirected to 0x4c31a70 (calloc)
+--30313-- REDIR: 0x5272c30 (libc.so.6:realloc) redirected to 0x4c31cb0 (realloc)
+--30313-- REDIR: 0x5355950 (libc.so.6:__strcpy_ssse3) redirected to 0x4c32dd0 (strcpy)
+--30313-- REDIR: 0x53681d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
+--30313-- REDIR: 0x5271070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
+--30313-- REDIR: 0x5368590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
+--30313-- REDIR: 0x5368ab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
+--30313-- REDIR: 0x5271950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
+--30313-- REDIR: 0x5343d60 (libc.so.6:__strcmp_ssse3) redirected to 0x4c33da0 (strcmp)
+--30313-- REDIR: 0x5364420 (libc.so.6:__memchr_avx2) redirected to 0x4c33f80 (memchr)
+--30313-- REDIR: 0x5368ad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
+==30313== 
+==30313== HEAP SUMMARY:
+==30313==     in use at exit: 108 bytes in 2 blocks
+==30313==   total heap usage: 12 allocs, 10 frees, 8,663 bytes allocated
+==30313== 
+==30313== Searching for pointers to 2 not-freed blocks
+==30313== Checked 74,504 bytes
+==30313== 
+==30313== 108 bytes in 2 blocks are definitely lost in loss record 1 of 1
+==30313==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==30313==    by 0x10A1B0: main (server.c:354)
+==30313== 
+==30313== LEAK SUMMARY:
+==30313==    definitely lost: 108 bytes in 2 blocks
+==30313==    indirectly lost: 0 bytes in 0 blocks
+==30313==      possibly lost: 0 bytes in 0 blocks
+==30313==    still reachable: 0 bytes in 0 blocks
+==30313==         suppressed: 0 bytes in 0 blocks
+==30313== 
+==30313== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==30313== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)

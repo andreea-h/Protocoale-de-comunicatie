@@ -2,9 +2,9 @@ PORT=8080
 IP_ADDR=127.0.0.1
 
 build:
-	gcc publisher.c -o publisher
-	gcc server.c -o server -lm
-	gcc subscriber.c -o subscriber
+	gcc publisher.c -o publisher -g
+	gcc server.c -o server -lm -g
+	gcc subscriber.c -o subscriber -g
 run_publisher:
 	./publisher ${IP_ADDR} ${PORT}
 run_server:
