@@ -15,11 +15,6 @@
 #define MAX_CLIENTS 1000
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-//mesajul primit de la un client UPD este de forma (topic, tip_date, continut)
-
-//mesajul primit de la un client TCP este de forma
-
-//argumentul primit este portul pe care serverul va deschide socketi
 
 client *clients; //vector de structuri de tip client care retine toti clientii la un moment dat
 int clients_nr; //numarul de clienti 'administrati' de server
@@ -75,14 +70,9 @@ client *get_client(int socket) {
 //inchide conexiunea cu toti cientii
 void close_all_clients(fd_set fds, int fd_max, int tcp_sock) {
 	int i;
-	char *disconnect = (char *)malloc(30 * sizeof(char));
-	strcpy(disconnect, "exit");
 	for(i = 0; i <= fd_max; i++) {
 		if (FD_ISSET(i, &fds)) {
-			//send(i, disconnect, strlen(disconnect), 0);
-			printf("mesaj trimis catre %d, %s\n", i, disconnect);
 			close(i);
-			//FD_CLR(i, &fds);
 		}
 	}
 }
@@ -97,7 +87,6 @@ int remove_topic(char id_client[], char topic_name[]) {
 			poz = i;
 		}
 	}
-	printf("%d\n", poz);
 	if(poz == -1) { //s-a trimis comanda 'unsubscribe <topic_inexistent>'
 		return -1;
 	}
@@ -130,21 +119,17 @@ int extract_payload(publisher_message *pub_message, subscriber_message *sub_mess
 	if(pub_message->data_type == 0) { //tipul INT
 		//extrage octetul de semn
 		uint8_t *sign = (uint8_t *)(pub_message->message);
-		//printf("bit de semn: %u\n", *sign);
 		if(*sign != 0 && *sign != 1) {
 			return -1;
 		}
 		uint32_t *number = (uint32_t *)malloc(1 * sizeof(uint32_t));
 
 		memcpy(number, pub_message->message + 1, 4);
-		//printf("number: %d\n", *number);
 		*number = ntohl(*number);
-		//printf("number_host: %d\n", *number);
-
+	
 		int64_t result = *number;
-		if(*sign == 1) {//numar negativ
+		if(*sign == 1) {    //numar negativ
 			result = (-1) * result;
-			//printf("res: %ld\n", result);
 		}
 		
 		sprintf(sub_message->message, "%lld", (long long)result);
@@ -153,11 +138,8 @@ int extract_payload(publisher_message *pub_message, subscriber_message *sub_mess
 	else if(pub_message->data_type == 1) { //tipul SHORT_REAL
 		uint16_t number;
 		memcpy(&number, pub_message->message, 4);
-		//printf("modul: %hu\n", number);
 		number = ntohs(number);
-		//printf("modul_host: %hu\n", number);
 		double result = number;
-		//printf("modul_host: %f\n", result);
 		result = result / 100;
 		sprintf(sub_message->message, "%.2f",result);
 		return 1;
@@ -169,10 +151,9 @@ int extract_payload(publisher_message *pub_message, subscriber_message *sub_mess
 		if(*sign != 0 && *sign != 1) { //format invalid
 			return -1; 
 		}
-
 		uint32_t first_part;
 		uint32_t *nr = (uint32_t *)(pub_message->message + 1);
-		//void *p = (void *)ntohl(pub_message->message + 1);
+		
 		*nr = ntohl(*nr);
 		memcpy(&first_part, nr, 4);
 
@@ -191,10 +172,6 @@ int extract_payload(publisher_message *pub_message, subscriber_message *sub_mess
 	}
 	else if(pub_message->data_type == 3) { //tipul STRING
 		sprintf(sub_message->message, "%s", pub_message->message);
-		printf("BEFORE: %s\n", pub_message->message);
-		//strncpy(sub_message->message, pub_message->message, strlen(pub_message->message) - 1);
-		//sub_message->message[strlen(sub_message->message)] = '\0';
-		printf("EXTRACTED: %s\n", sub_message->message);
 		return 1;
 	}
 	return -1;
@@ -249,8 +226,6 @@ int main(int argc, char *argv[])
 	tcp_sock.sin_family = AF_INET;
 	tcp_sock.sin_port = htons(port);
 	tcp_sock.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	//printf("port socket: %hu\n", ntohs(tcp_sock.sin_port));
 
 	//aloca intial spatiu pentru 1 client
 	clients = (client *)malloc(1 * sizeof(client));
@@ -318,8 +293,6 @@ int main(int argc, char *argv[])
 
 				else if(i == pass_socket_tcp) { //s-a primit o cerere de conexiune pe socketul pasiv
 					//serverul accepta cererea de conexiune de la client daca aceasta este valida
-				//	printf("s-a primit o cerere de conexiune, nr curent de clienti: %d\n", clients_nr);
-
 					socklen_t socklen;
 					socklen_t client_len = sizeof(client_addr);
 					int new_sock_fd = accept(pass_socket_tcp, (struct sockaddr *) &client_addr, &client_len);
@@ -341,7 +314,6 @@ int main(int argc, char *argv[])
 					//sau este o cerere de reconectare
 					//sau este o situatie care nu este permisa (conectarea simultana a doi clienti avand acelasi id_client)
 					if(check_client_unique(buff) == -1) {
-						//printf("CLIENT NOU\n");
 						//adauga clientul conectat in lista de clienti in situatia in care clientul este unul nou
 						//adaugarea unui client in lista de clienti se face doar daca nu avem o reconectare
 
@@ -361,11 +333,7 @@ int main(int argc, char *argv[])
 
 						printf("New client (%s) connected from %s:%hu.\n",
 								buff, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-						//printf("Socket pentru conectare: %d\n", new_sock_fd);
 						//serverul stie ca dupa ce a acceptat o conexiune trebuie sa primeasca Client_ID-ul celui care s-a conectat
-						
-					//	printf("Client_ID: %s\n", buff);
-						//creeaza un membru 'client', continand id-ul celui care s-a conectat
 						
 						// se adauga noul socket intors de accept() la multimea descriptorilor de citire
 						FD_SET(new_sock_fd, &read_fds);
@@ -373,7 +341,6 @@ int main(int argc, char *argv[])
 							fd_max = new_sock_fd;
 						}
 						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
-						
 						subscriber_message server_msg;
 						strcpy(server_msg.message, "Available Client_Id.\n");
 						
@@ -385,12 +352,9 @@ int main(int argc, char *argv[])
 						
 					}
 					else if(check_client_unique(buff) == 0) { //s-a facut o cerere de reconectare
-					//	printf("RECONECTARE\n");
 						printf("New client (%s) connected from %s:%hu.\n",
 								buff, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-						//printf("Socket pentru conectare: %d\n", new_sock_fd);
-
-						// se adauga noul socket intors de accept() la multimea descriptorilor de citire
+						//se adauga noul socket intors de accept() la multimea descriptorilor de citire
 						FD_SET(new_sock_fd, &read_fds);
 						if (new_sock_fd > fd_max) { 
 							fd_max = new_sock_fd;
@@ -449,35 +413,18 @@ int main(int argc, char *argv[])
 					
 					publisher_message *pub_message; //memoreaza mesajul udp trimis la server de catre clientul upd
 					pub_message = (publisher_message *)malloc(sizeof(publisher_message));
-					//int rec = recvfrom(pass_socket_udp, &pub_message, sizeof(publisher_message), 0, (struct sockaddr *) &udp_sock, &socklen);
 					
 					memset(buff, 0, BUFLEN);
 					int rec = recvfrom(pass_socket_udp, buff, BUFLEN, 0, (struct sockaddr *) &udp_sock, &socklen);
-					printf("buff: %s\n", buff);
+				
 					if(rec < 0) {
 						exit_error("[!] Receiving error\n");
 						exit(1);
 					}
-					//printf("am primit: %s, dimensiune date: %ld\n", buff, strlen(buff));
 					
 					//mesajul upd trebuie trimis mai departe catre clientii tcp abonati la topicul din mesaj
 					//formateaza mesajul udp primit
-					char topic[51];
-					strncpy(topic, buff, 50);
-					topic[50] = '\0';
-					printf("topic mesaj primit: %s\n", topic);
-
-					//tipul de date din mesajul primit
-					printf("tipul de date: %hu\n", buff[50]);
 					
-					//payload 
-					char msg[1500];
-					int k;
-					for(k = 0; k < 1500; k++) {
-						msg[k] = buff[k + 51];
-					}
-
-					printf("mesaj: %s\n", msg);
 					memcpy(pub_message, buff, sizeof(publisher_message));
 					//se construieste mesajul tcp catre clienti pe baza mesajului upd primit
 					//'sub_message' retine mesajul trimis clientilor TCP de catre server
@@ -508,26 +455,13 @@ int main(int argc, char *argv[])
 					sub_message->client_port = ntohs(udp_sock.sin_port);
                     strcpy(sub_message->ip_source, inet_ntoa(udp_sock.sin_addr));
 
-                    printf("ip client udp: %s\n", sub_message->ip_source);
-                    printf("port client %hu\n", sub_message->client_port);
-
-					printf("topic mesaj trimis: %s\n", sub_message->topic_name);
-					printf("tipul este: %s\n", sub_message->data_type);
-					printf("payload: %s\n", sub_message->message);
-
-
                     //cauta clientii care au in lista de topicuri acele topicuri cu numele 'sub_message.topic_name'
                     int i;
                     for(i = 0; i < clients_nr; i++) {
                     	//intoarce 1 daca topic_name exista in lista de topicuri la care este abonat clientul
-                    	//TO DO COMPONENETA SF
-                    	//printf("client: %s\n", clients[i].id_client);
-
                     	//clientul de la indexul 'i' este abonat la topic
                     	int pos = find_topic_name(clients[i].topics, clients[i].topics_nr, sub_message->topic_name);
                     	if(pos != -1 && clients[i].connected == 1) { //clientul este conectat
-                    		printf("client: %s\n", clients[i].id_client);
-
                     		int check = 1;
 							setsockopt(clients[i].socket, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
 
@@ -563,7 +497,6 @@ int main(int argc, char *argv[])
 					
 					if(result_recv == 0) { //conexiune inchisa
 						//gaseste id_client
-						printf("DECONECTARE\n");
 						char *id = (char *)malloc(11 * sizeof(char));
 						
 						strcpy(id, tcp_client->id_client);
@@ -571,16 +504,11 @@ int main(int argc, char *argv[])
 						tcp_client->socket = -1;
 
 						printf("Client (%s) disconnected\n", id);
-						printf("Socket pentru deconectare: %d\n", i); 
-						// se scoate din multimea de citire socketul inchis 
+						//se scoate din multimea de citire socketul inchis 
 						FD_CLR(i, &read_fds);
 						close(i);
 					}
 					else {
-						printf ("Clientul (%s) de pe socketul %d a trimis mesajul:\n", tcp_client->id_client, tcp_client->socket);
-						printf("topic_name: %s\n", client_msg.request_topic.topic_name);
-						printf("type_req: %d\n", client_msg.request_topic.st);
-						printf("client_id: %s\n", client_msg.client_id);
 						if(client_msg.request_type == 'u') {
 							
 							//printf("unsubscribe\n");
@@ -607,17 +535,8 @@ int main(int argc, char *argv[])
 									exit(1);
 								}
 							}
-							printf("********************** lista topicuri\n");
-							int l;
-							for(l = 0; l < tcp_client->topics_nr; l++) {
-								printf("topic_name: %s\n", tcp_client->topics[l].topic_name);
-							}
-
-							printf("**********************\n");
-	 					
 						}
 						else if(client_msg.request_type == 's') {
-							printf("subscribe\n");
 							int check_topic = find_topic_name(tcp_client->topics, tcp_client->topics_nr, client_msg.request_topic.topic_name);
 							
 							//verifica daca clientul s-a mai abonat la acest topic
@@ -659,14 +578,6 @@ int main(int argc, char *argv[])
 								new_topic.st = client_msg.request_topic.st;
 								tcp_client->topics = (topic *)realloc(tcp_client->topics, (tcp_client->topics_nr + 2) * sizeof(topic));
 								tcp_client->topics[tcp_client->topics_nr++] = new_topic;
-								printf("********************** lista topicuri\n");
-								int l;
-								for(l = 0; l < tcp_client->topics_nr; l++) {
-									printf("topic_name: %s\n", tcp_client->topics[l].topic_name);
-								}
-
-								printf("**********************\n");
-
 								subscriber_message server_msg;
 						
 								strcpy(server_msg.topic_name, tcp_client->topics[check_topic].topic_name);

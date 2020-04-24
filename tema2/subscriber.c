@@ -12,14 +12,6 @@
 
 #define BUFLEN 1501
 
-// comenzi:
-// subscribe topic SF    (SF=0/1)
-// unsubscribe topic
-// exit
-
-// feedback de la server: (un)subscribed topic (dupa ce a fost trimisa catre server comanda)
-// va afisa toate mesajele pe care le primeste de la server: 'IP:PORT client_UDP - topic - tip_date - valoare mesaj'
-
 void usage(char *file)
 {
 	fprintf(stderr, "Usage: %s <ID_Client> <IP_Server> <Port_Server>\n", file);
@@ -106,12 +98,7 @@ int main(int argc, char *argv[])
 		close(sock_fd);
 		return 0;
     } 
-    //verifica daca mesajul trimis de server nu indica faptul ca clientul are de primit mesaje 
-    // stocate cat timp acesta era deconectat
-    if(strcmp(check_msg, "There are messages that need to be forwarded?\n") == 0) {
-    	printf("aici\n");
-    }    
-
+   
 	while(1) {
 		tmp_fds = read_fds;
 		val = select(fdmax + 1, &tmp_fds, NULL, NULL, NULL);
@@ -137,8 +124,6 @@ int main(int argc, char *argv[])
 			int nr_params = 1; //nr de parametri din comanda preluata de la stdin
 
 			char *tmp_token = strtok(buff_temp, " ");
-			printf("fst_token: %s\n", tmp_token);
-
 			if(strcmp(tmp_token, "subscribe") != 0 && strcmp(tmp_token, "unsubscribe") != 0) {
 				printf("[!] Wrong format. Correct usage: \"subscribe <topic_name> <SF>\" or  \"unsubscribe <topic_name>\" or \"exit\"\n");
 				continue;
@@ -150,8 +135,6 @@ int main(int argc, char *argv[])
 				nr_params++;
 				tmp_token = strtok(NULL, " ");
 			}
-
-			printf("params:%d\n", nr_params);
 			if((nr_params - 1) != 3) {
 				printf("[!] Wrong format. Correct usage: \"subscribe <topic_name> <SF>\" or  \"unsubscribe <topic_name>\" or \"exit\"\n");
 				continue;
@@ -173,7 +156,6 @@ int main(int argc, char *argv[])
 
 			token = strtok(NULL, " ");
 			//extrage numele topicului
-			printf("token: %s\n", token);
 			strcpy(request_topic.topic_name, token);
 
 			if(request.request_type == 's') {
@@ -184,7 +166,6 @@ int main(int argc, char *argv[])
 				}
 				else {
 					request_topic.st = atoi(token);
-					printf("sotpic sf: %d\n", request_topic.st);
 					//verifica daca valoarea oferita la stdin pentru campul 'st' (in cazul comenzii 'subscribe') este cea corecta
 					if(request_topic.st != 1) {
 						exit_error("[!] Wrong SF value! Values accepted: 0 or 1...\n");
@@ -193,7 +174,6 @@ int main(int argc, char *argv[])
 				}
 			}
 			else { //comanda pentru unsubscribe are setata valoarea pentru st ('store') egala cu -1
-				
 				request_topic.st = -1;
 				//ultimul caracter din nume_topic pentru input corect, in cazul unsubscribe este '\n'
 				//este inlocuit ultimul caracter din topic cu aracterul '\0'
@@ -201,13 +181,7 @@ int main(int argc, char *argv[])
 			}
 			
 			strcpy(request.client_id, argv[1]);
-			printf("argv[1] %s\n", argv[1]);
-			printf("id_client: %s\n", request.client_id);
 			request.request_topic = request_topic;
-
-			printf("client: %s\n", request.client_id);
-			printf("topic_name: %s\n", request.request_topic.topic_name);
-
 			// se trimite mesaj la server
 			int sending1 = send(sock_fd, &request, sizeof(client_request), 0);
 			if(sending1 < 0) {
@@ -241,7 +215,6 @@ int main(int argc, char *argv[])
 					continue;
 				}
 			}
-	
 			//afiseaza feedback pentru comanda tocmai trimisa catre server de catre client 
 			//daca aceasta a fost acceptata cu succes de catre server
 			if(request.request_type == 's') {
@@ -264,17 +237,9 @@ int main(int argc, char *argv[])
 				continue;
 			}
 
-            if(val == 0) {
-            	//printf("Serverul a inchis conexiunea!\n");
+            if(val == 0) { //serverul a inchis conexiunea
             	break;
             } 
-
-            /*if(strlen(client_msg->message) == 0) {
-				exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
-				close(sock_fd);
-				return 0;
-			}*/
-
 			printf("%s:%hu - %s - %s - %s\n", client_msg->ip_source, client_msg->client_port, 
 				client_msg->topic_name, client_msg->data_type, client_msg->message);
 		}
