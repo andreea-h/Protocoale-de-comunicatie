@@ -1,0 +1,160 @@
+==7855== Memcheck, a memory error detector
+==7855== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==7855== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==7855== Command: ./subscriber s1 127.0.0.1 8080~
+==7855== Parent PID: 7854
+==7855== 
+--7855-- 
+--7855-- Valgrind options:
+--7855--    --leak-check=full
+--7855--    --show-leak-kinds=all
+--7855--    --track-origins=yes
+--7855--    --verbose
+--7855--    --log-file=valgrind-client-out.txt
+--7855-- Contents of /proc/version:
+--7855--   Linux version 4.15.0-96-generic (buildd@lgw01-amd64-004) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #97-Ubuntu SMP Wed Apr 1 03:25:46 UTC 2020
+--7855-- 
+--7855-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--7855-- Page sizes: currently 4096, max supported 4096
+--7855-- Valgrind library directory: /usr/lib/valgrind
+--7855-- Reading syms from /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber
+--7855-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
+--7855--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
+--7855--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
+--7855--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
+--7855--   .. CRC is valid
+--7855-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--7855--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--7855--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
+--7855--    object doesn't have a symbol table
+--7855--    object doesn't have a dynamic symbol table
+--7855-- Scheduler: using generic scheduler lock implementation.
+--7855-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==7855== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-7855-by-andreea-on-???
+==7855== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-7855-by-andreea-on-???
+==7855== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-7855-by-andreea-on-???
+==7855== 
+==7855== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==7855== don't want to do, unless you know exactly what you're doing,
+==7855== or are doing some strange experiment):
+==7855==   /usr/lib/valgrind/../../bin/vgdb --pid=7855 ...command...
+==7855== 
+==7855== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==7855==   /path/to/gdb ./subscriber
+==7855== and then give GDB the following command
+==7855==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=7855
+==7855== --pid is optional if only one valgrind process is running
+==7855== 
+--7855-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
+--7855-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
+--7855-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--7855--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--7855--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
+--7855--    object doesn't have a symbol table
+--7855-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--7855--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--7855--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
+--7855--    object doesn't have a symbol table
+==7855== WARNING: new redirection conflicts with existing -- ignoring it
+--7855--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x580608c1 ???
+--7855--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
+--7855-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
+--7855-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
+--7855-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
+--7855--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
+--7855--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
+--7855--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
+--7855--   .. CRC is valid
+--7855-- REDIR: 0x4edac70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edaf50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edc7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edade0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edac10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edad40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ef80f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edafa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edb0e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed97c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ed9c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ee46c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edaff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edabe0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4ef8eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4eda050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edaf20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edaef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edc7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4edb040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7855-- REDIR: 0x4fca3c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
+--7855-- REDIR: 0x4fca590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
+--7855-- REDIR: 0x4ed3070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
+--7855-- REDIR: 0x4fcaad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
+--7855-- REDIR: 0x4fa5d60 (libc.so.6:__strcmp_ssse3) redirected to 0x4c33da0 (strcmp)
+--7855-- REDIR: 0x4fcaf50 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4c365d0 (memset)
+--7855-- REDIR: 0x4fc6420 (libc.so.6:__memchr_avx2) redirected to 0x4c33f80 (memchr)
+--7855-- REDIR: 0x4fb7950 (libc.so.6:__strcpy_ssse3) redirected to 0x4c32dd0 (strcpy)
+--7855-- REDIR: 0x4fc6300 (libc.so.6:__strspn_sse42) redirected to 0x4c37990 (strspn)
+--7855-- REDIR: 0x4fc6070 (libc.so.6:__strcspn_sse42) redirected to 0x4c378d0 (strcspn)
+--7855-- REDIR: 0x4fca1d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
+--7855-- REDIR: 0x4fcaab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
+==7855== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7855==    at 0x4F5EC4D: send (send.c:28)
+==7855==    by 0x10964C: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855==  Address 0x1ffeffefb9 is on thread 1's stack
+==7855==  in frame #1, created by main (???:)
+==7855==  Uninitialised value was created by a stack allocation
+==7855==    at 0x108D9A: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855== 
+--7855-- REDIR: 0x4ed3950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
+==7855== 
+==7855== HEAP SUMMARY:
+==7855==     in use at exit: 1,188,852 bytes in 753 blocks
+==7855==   total heap usage: 755 allocs, 2 frees, 1,190,900 bytes allocated
+==7855== 
+==7855== Searching for pointers to 753 not-freed blocks
+==7855== Checked 70,424 bytes
+==7855== 
+==7855== 100 bytes in 1 blocks are definitely lost in loss record 1 of 4
+==7855==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7855==    by 0x10907E: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855== 
+==7855== 1,581 bytes in 1 blocks are definitely lost in loss record 2 of 4
+==7855==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7855==    by 0x109049: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855== 
+==7855== 3,002 bytes in 2 blocks are definitely lost in loss record 3 of 4
+==7855==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7855==    by 0x1092A6: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855== 
+==7855== 1,184,169 bytes in 749 blocks are definitely lost in loss record 4 of 4
+==7855==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7855==    by 0x1097D0: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855== 
+==7855== LEAK SUMMARY:
+==7855==    definitely lost: 1,188,852 bytes in 753 blocks
+==7855==    indirectly lost: 0 bytes in 0 blocks
+==7855==      possibly lost: 0 bytes in 0 blocks
+==7855==    still reachable: 0 bytes in 0 blocks
+==7855==         suppressed: 0 bytes in 0 blocks
+==7855== 
+==7855== ERROR SUMMARY: 6 errors from 5 contexts (suppressed: 0 from 0)
+==7855== 
+==7855== 2 errors in context 1 of 5:
+==7855== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7855==    at 0x4F5EC4D: send (send.c:28)
+==7855==    by 0x10964C: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855==  Address 0x1ffeffefb9 is on thread 1's stack
+==7855==  in frame #1, created by main (???:)
+==7855==  Uninitialised value was created by a stack allocation
+==7855==    at 0x108D9A: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/subscriber)
+==7855== 
+==7855== ERROR SUMMARY: 6 errors from 5 contexts (suppressed: 0 from 0)

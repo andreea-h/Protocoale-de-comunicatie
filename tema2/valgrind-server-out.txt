@@ -1,0 +1,317 @@
+==7853== Memcheck, a memory error detector
+==7853== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==7853== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==7853== Command: ./server 8080
+==7853== Parent PID: 7852
+==7853== 
+--7853-- 
+--7853-- Valgrind options:
+--7853--    --leak-check=full
+--7853--    --show-leak-kinds=all
+--7853--    --track-origins=yes
+--7853--    --verbose
+--7853--    --log-file=valgrind-server-out.txt
+--7853-- Contents of /proc/version:
+--7853--   Linux version 4.15.0-96-generic (buildd@lgw01-amd64-004) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #97-Ubuntu SMP Wed Apr 1 03:25:46 UTC 2020
+--7853-- 
+--7853-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--7853-- Page sizes: currently 4096, max supported 4096
+--7853-- Valgrind library directory: /usr/lib/valgrind
+--7853-- Reading syms from /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server
+--7853-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
+--7853--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
+--7853--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
+--7853--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
+--7853--   .. CRC is valid
+--7853-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--7853--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--7853--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
+--7853--    object doesn't have a symbol table
+--7853--    object doesn't have a dynamic symbol table
+--7853-- Scheduler: using generic scheduler lock implementation.
+--7853-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==7853== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-7853-by-andreea-on-???
+==7853== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-7853-by-andreea-on-???
+==7853== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-7853-by-andreea-on-???
+==7853== 
+==7853== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==7853== don't want to do, unless you know exactly what you're doing,
+==7853== or are doing some strange experiment):
+==7853==   /usr/lib/valgrind/../../bin/vgdb --pid=7853 ...command...
+==7853== 
+==7853== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==7853==   /path/to/gdb ./server
+==7853== and then give GDB the following command
+==7853==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=7853
+==7853== --pid is optional if only one valgrind process is running
+==7853== 
+--7853-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
+--7853-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
+--7853-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--7853--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--7853--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
+--7853--    object doesn't have a symbol table
+--7853-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--7853--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--7853--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
+--7853--    object doesn't have a symbol table
+==7853== WARNING: new redirection conflicts with existing -- ignoring it
+--7853--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x580608c1 ???
+--7853--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
+--7853-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
+--7853-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
+--7853-- Reading syms from /lib/x86_64-linux-gnu/libm-2.27.so
+--7853--   Considering /lib/x86_64-linux-gnu/libm-2.27.so ..
+--7853--   .. CRC mismatch (computed 7feae033 wanted b29b2508)
+--7853--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libm-2.27.so ..
+--7853--   .. CRC is valid
+--7853-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
+--7853--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
+--7853--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
+--7853--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
+--7853--   .. CRC is valid
+--7853-- REDIR: 0x5278c70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278f50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x527a7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278de0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278c10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278d40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x52960f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278fa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x52790e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x52777c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5277c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x52826c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278ff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278be0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5296eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278f20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5278ef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x527a7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x5279040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--7853-- REDIR: 0x53683c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
+--7853-- REDIR: 0x5368f50 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4c365d0 (memset)
+--7853-- REDIR: 0x5271070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x109CFF: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+--7853-- REDIR: 0x5272c30 (libc.so.6:realloc) redirected to 0x4c31cb0 (realloc)
+--7853-- REDIR: 0x5355950 (libc.so.6:__strcpy_ssse3) redirected to 0x4c32dd0 (strcpy)
+--7853-- REDIR: 0x53681d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
+--7853-- REDIR: 0x5368590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
+--7853-- REDIR: 0x5368ab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
+==7853== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7853==    at 0x52FCC4D: send (send.c:28)
+==7853==    by 0x10A1C9: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x1ffeffead0 is on thread 1's stack
+==7853==  in frame #1, created by main (???:)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== Invalid read of size 1
+==7853==    at 0x5355950: __strcpy_ssse3 (strcpy-ssse3.S:32)
+==7853==    by 0x10B618: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x55cbc1a is 10 bytes after a block of size 1,024 alloc'd
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x525818B: _IO_file_doallocate (filedoalloc.c:101)
+==7853==    by 0x5268378: _IO_doallocbuf (genops.c:365)
+==7853==    by 0x5267497: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:759)
+==7853==    by 0x52659EC: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1266)
+==7853==    by 0x5235533: vfprintf (vfprintf.c:1328)
+==7853==    by 0x523EF25: printf (printf.c:33)
+==7853==    by 0x10A111: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7853==    at 0x52FCC4D: send (send.c:28)
+==7853==    by 0x10B67B: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x1ffeffef8f is on thread 1's stack
+==7853==  in frame #1, created by main (???:)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+--7853-- REDIR: 0x5343d60 (libc.so.6:__strcmp_ssse3) redirected to 0x4c33da0 (strcmp)
+--7853-- REDIR: 0x5357100 (libc.so.6:__strncpy_ssse3) redirected to 0x4c32fb0 (strncpy)
+--7853-- REDIR: 0x5368ad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
+==7853== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7853==    at 0x52FCC4D: send (send.c:28)
+==7853==    by 0x10AB10: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x55cd108 is 8 bytes inside a block of size 1,581 alloc'd
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10A784: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a heap allocation
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10A784: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x4C32D08: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x52374D2: vfprintf (vfprintf.c:1643)
+==7853==    by 0x523EF25: printf (printf.c:33)
+==7853==    by 0x10A75C: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x4C32E08: strcpy (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x1097E9: extract_payload (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==    by 0x10A867: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109844: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x4C32D08: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x52374D2: vfprintf (vfprintf.c:1643)
+==7853==    by 0x523EF25: printf (printf.c:33)
+==7853==    by 0x109805: extract_payload (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==    by 0x10A867: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109844: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+--7853-- REDIR: 0x5364420 (libc.so.6:__memchr_avx2) redirected to 0x4c33f80 (memchr)
+--7853-- REDIR: 0x5271950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
+==7853== 
+==7853== HEAP SUMMARY:
+==7853==     in use at exit: 3,596,630 bytes in 2,612 blocks
+==7853==   total heap usage: 2,617 allocs, 5 frees, 3,598,883 bytes allocated
+==7853== 
+==7853== Searching for pointers to 2,612 not-freed blocks
+==7853== Checked 74,496 bytes
+==7853== 
+==7853== 11 bytes in 1 blocks are definitely lost in loss record 1 of 8
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10AE0C: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 30 bytes in 1 blocks are definitely lost in loss record 2 of 8
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x1092BC: close_all_clients (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==    by 0x109DD8: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 43 bytes in 1 blocks are still reachable in loss record 3 of 8
+==7853==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x109F1E: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 162 bytes in 1 blocks are definitely lost in loss record 4 of 8
+==7853==    at 0x4C31D2F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10B4B4: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 1,252 bytes in 313 blocks are definitely lost in loss record 5 of 8
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10959F: extract_payload (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==    by 0x10A867: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 1,581 bytes in 1 blocks are definitely lost in loss record 6 of 8
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10A068: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 1,780,144 bytes in 1,147 blocks are definitely lost in loss record 7 of 8
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10A611: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 1,813,407 bytes in 1,147 blocks are definitely lost in loss record 8 of 8
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10A784: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== LEAK SUMMARY:
+==7853==    definitely lost: 3,596,587 bytes in 2,611 blocks
+==7853==    indirectly lost: 0 bytes in 0 blocks
+==7853==      possibly lost: 0 bytes in 0 blocks
+==7853==    still reachable: 43 bytes in 1 blocks
+==7853==         suppressed: 0 bytes in 0 blocks
+==7853== 
+==7853== ERROR SUMMARY: 1017 errors from 15 contexts (suppressed: 0 from 0)
+==7853== 
+==7853== 1 errors in context 1 of 15:
+==7853== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7853==    at 0x52FCC4D: send (send.c:28)
+==7853==    by 0x10A1C9: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x1ffeffead0 is on thread 1's stack
+==7853==  in frame #1, created by main (???:)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 
+==7853== 2 errors in context 2 of 15:
+==7853== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7853==    at 0x52FCC4D: send (send.c:28)
+==7853==    by 0x10B67B: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x1ffeffef8f is on thread 1's stack
+==7853==  in frame #1, created by main (???:)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 
+==7853== 2 errors in context 3 of 15:
+==7853== Invalid read of size 1
+==7853==    at 0x5355950: __strcpy_ssse3 (strcpy-ssse3.S:32)
+==7853==    by 0x10B618: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x55cbc1a is 10 bytes after a block of size 1,024 alloc'd
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x525818B: _IO_file_doallocate (filedoalloc.c:101)
+==7853==    by 0x5268378: _IO_doallocbuf (genops.c:365)
+==7853==    by 0x5267497: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:759)
+==7853==    by 0x52659EC: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1266)
+==7853==    by 0x5235533: vfprintf (vfprintf.c:1328)
+==7853==    by 0x523EF25: printf (printf.c:33)
+==7853==    by 0x10A111: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 
+==7853== 7 errors in context 4 of 15:
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x109CFF: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 
+==7853== 83 errors in context 5 of 15:
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x4C32D08: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x52374D2: vfprintf (vfprintf.c:1643)
+==7853==    by 0x523EF25: printf (printf.c:33)
+==7853==    by 0x109805: extract_payload (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==    by 0x10A867: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109844: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 
+==7853== 83 errors in context 6 of 15:
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x4C32E08: strcpy (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x1097E9: extract_payload (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==    by 0x10A867: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109844: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 
+==7853== 83 errors in context 7 of 15:
+==7853== Conditional jump or move depends on uninitialised value(s)
+==7853==    at 0x4C32D08: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x52374D2: vfprintf (vfprintf.c:1643)
+==7853==    by 0x523EF25: printf (printf.c:33)
+==7853==    by 0x10A75C: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a stack allocation
+==7853==    at 0x109849: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== 
+==7853== 749 errors in context 8 of 15:
+==7853== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==7853==    at 0x52FCC4D: send (send.c:28)
+==7853==    by 0x10AB10: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Address 0x55cd108 is 8 bytes inside a block of size 1,581 alloc'd
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10A784: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853==  Uninitialised value was created by a heap allocation
+==7853==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==7853==    by 0x10A784: main (in /home/andreea/Desktop/PROTOCOALE/Protocoale-de-comunicatie/tema2/server)
+==7853== 
+==7853== ERROR SUMMARY: 1017 errors from 15 contexts (suppressed: 0 from 0)
