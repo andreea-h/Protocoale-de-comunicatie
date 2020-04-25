@@ -406,25 +406,35 @@ int main(int argc, char *argv[])
 
 						//trimite catre client mesajele stocate pentru forward
 						int c = 0;
-						
+						subscriber_message msg;
 						for(c = 0; c < current_client->stored; c++) {
-							ret = send(new_sock_fd, &(current_client->stored_messages[c]), sizeof(subscriber_message), 0);
+							msg = current_client->stored_messages[c];
+							printf("TOOOOPIC: %s; dimeniune date: %ld\n", msg.topic_name, sizeof(subscriber_message));
+							printf("%s:%hu - %s - %s - %s\n", msg.ip_source, msg.client_port, 
+								msg.topic_name, msg.data_type, msg.message);
+
+							ret = send(new_sock_fd, &msg, sizeof(subscriber_message), 0);
 							if(ret < 0) {
 								exit_error("[!] Send error in server...\n");
 								exit(1);
 							}
 							
 							//odata trimise mesajele, acestea vor fi eliminate din vector
-							int j;
+						/*	int j;
 							printf("STORED pentru %s  ....  %d\n", current_client->id_client, current_client->stored);
 							for(j = c; j < current_client->stored - 1; j++) {
 								current_client->stored_messages[j] = current_client->stored_messages[j + 1];
 							}
 							c--;
 							(current_client->stored)--;
-							//free(&(current_client->stored_messages[c]));
+							//free(&(current_client->stored_messages[c]));*/
 						}	
-						
+						int j;
+						//printf("STORED pentru %s  ....  %d\n", current_client->id_client, current_client->stored);
+						free(current_client->stored_messages);
+						current_client->stored_messages = (subscriber_message *)calloc(1, sizeof(subscriber_message));
+						current_client->stored = 0;
+
 						//dupa trimiterea mesajelor, se elibereaza memoria alocata pentru stocarea acestora
 						free(server_msg);
 					}
@@ -514,9 +524,9 @@ int main(int argc, char *argv[])
                     	//dar abonat la topic avand SF == 1
                     	else if(pos != -1 && clients[i].connected == 0 && clients[i].topics[pos].st == 1) {
                     		clients[i].stored_messages = realloc(clients[i].stored_messages, (clients[i].stored + 1) * sizeof(subscriber_message));
-                    		memcpy(&clients[i].stored_messages[clients[i].stored], sub_message, sizeof(subscriber_message));
+                    		memcpy(&(clients[i].stored_messages[clients[i].stored]), sub_message, sizeof(subscriber_message));
                     		(clients[i].stored)++;
-                    		printf("STORED pentru %s  ....  %d\n", clients[i].id_client, clients[i].stored);
+                    		//printf("STORED pentru %s  ....  %d\n", clients[i].id_client, clients[i].stored);
                     	}
                     }
                     free(pub_message);
