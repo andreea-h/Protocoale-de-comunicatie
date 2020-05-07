@@ -9,8 +9,54 @@
 #include "helpers.h"
 #include "requests.h"
 
-char *compute_get_request(char *host, char *url, char *query_params,
-                            char **cookies, int cookies_count)
+
+
+char *compute_delete_request(char *host, char *url, char *query_params,char **cookies, int cookies_count, char *authorization)
+{
+    char *message = calloc(BUFLEN, sizeof(char));
+    char *line = calloc(LINELEN, sizeof(char));
+
+    // Step 1: write the method name, URL, request params (if any) and protocol type
+    if (query_params != NULL) {
+        sprintf(line, "DELETE %s?%s HTTP/1.1", url, query_params);
+    } else {
+        sprintf(line, "DELETE %s HTTP/1.1", url);
+    }
+
+    compute_message(message, line);
+
+    memset(line, 0, LINELEN);
+    // Step 2: add the host
+    sprintf(line, "Host: %s", host);
+    compute_message(message, line);
+
+    puts(message);
+
+    // Step 3 (optional): add headers and/or cookies, according to the protocol format
+    if (cookies_count != 0) {
+       char *buffer = (char *)calloc(BUFLEN, sizeof(char));
+       int i;
+       for(i = 0; i < cookies_count; i++) {
+            memset(buffer, 0, BUFLEN);
+            sprintf(buffer, "Cookie: %s", cookies[i]);
+            compute_message(message, buffer);
+       }
+    }
+    //daca este nevoie, este adaugat headerul Authorization
+    if (authorization != NULL) {
+        memset(line, 0, BUFLEN);
+        sprintf(line, "Authorization: Bearer %s", authorization);
+        compute_message(message, line);
+    }   
+    // Step 4: add final new line
+    
+    compute_message(message, "");
+    return message;
+}
+
+
+
+char *compute_get_request(char *host, char *url, char *query_params,char **cookies, int cookies_count, char *authorization)
 {
     char *message = calloc(BUFLEN, sizeof(char));
     char *line = calloc(LINELEN, sizeof(char));
@@ -41,14 +87,21 @@ char *compute_get_request(char *host, char *url, char *query_params,
             compute_message(message, buffer);
        }
     }
+    //daca este nevoie, este adaugat headerul Authorization
+    if (authorization != NULL) {
+        memset(line, 0, BUFLEN);
+        sprintf(line, "Authorization: Bearer %s", authorization);
+        compute_message(message, line);
+    }   
     // Step 4: add final new line
     
     compute_message(message, "");
     return message;
 }
 
+//auth este token ul authorization
 char *compute_post_request(char *host, char *url, char* content_type, char **body_data,
-                            int body_data_fields_count, char **cookies, int cookies_count)
+                            int body_data_fields_count, char **cookies, int cookies_count, char *authorization)
 {
     char *message = calloc(BUFLEN, sizeof(char));
     char *line = calloc(LINELEN, sizeof(char));
@@ -88,6 +141,12 @@ char *compute_post_request(char *host, char *url, char* content_type, char **bod
     	
         free(buffer);
     }
+
+    if (authorization != NULL) {
+        sprintf(line, "Authorization: Bearer %s", authorization);
+        compute_message(message, line);
+    }   
+
     // Step 5: add new line at end of header
    	sprintf(line, "");
     compute_message(message, line);
@@ -96,6 +155,7 @@ char *compute_post_request(char *host, char *url, char* content_type, char **bod
     // Step 6: add the actual payload data
     memset(line, 0, LINELEN);
 
+   
     char *buffer = (char *)calloc(BUFLEN, sizeof(char));
     int i;
     for(i = 0; i < body_data_fields_count; i++) {
@@ -103,8 +163,6 @@ char *compute_post_request(char *host, char *url, char* content_type, char **bod
         sprintf(buffer, "%s", body_data[i]);
         compute_message(message, buffer);
     }
-    
-    
-    free(line);
+
     return message;
 }
