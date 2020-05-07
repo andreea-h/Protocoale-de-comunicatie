@@ -30,7 +30,6 @@ char *compute_delete_request(char *host, char *url, char *query_params,char **co
     sprintf(line, "Host: %s", host);
     compute_message(message, line);
 
-    puts(message);
 
     // Step 3 (optional): add headers and/or cookies, according to the protocol format
     if (cookies_count != 0) {
@@ -74,9 +73,6 @@ char *compute_get_request(char *host, char *url, char *query_params,char **cooki
     // Step 2: add the host
     sprintf(line, "Host: %s", host);
     compute_message(message, line);
-
-    puts(message);
-
     // Step 3 (optional): add headers and/or cookies, according to the protocol format
     if (cookies_count != 0) {
        char *buffer = (char *)calloc(BUFLEN, sizeof(char));
