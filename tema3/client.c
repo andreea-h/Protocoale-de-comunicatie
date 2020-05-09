@@ -20,7 +20,9 @@ typedef struct client_info {
 	char *username;
 	char *password;
 	char *cookie; //cookie de sesiune
-	char *auth_token; //token jwt obtinut la enter_library, adaugat in headerul 'Authorization'
+	char *auth_token; //token jwt obtinut la enter_library, adaugat in headerul 'Authorization
+	bool cookie_set; //semnaleaza daca a s-a primit cookie-ul de sesiune
+	bool token_set; //semnaleaza daca s-a primit un token JWT
 } client_info;
 
 //afiseaza array-ul json alcatuit din carti
@@ -30,7 +32,7 @@ void print_json_array(JSON_Array *books, size_t nr_books) {
 		JSON_Object *json_obj = json_array_get_object(books, index);
 		double value1 = json_object_dotget_number(json_obj, "id");
 		const char *value2 = json_object_dotget_string(json_obj, "title");
-		printf("--> id - %d; title: %s\n", (int)value1, value2);
+		printf("--> Book Id - %d; Title: %s\n", (int)value1, value2);
 	}
 }
 
@@ -44,9 +46,9 @@ int parse_error_msg(JSON_Object *json_obj, const char *field, client_info *clien
     const char *message = json_object_dotget_string(json_obj, field);
     if(strcmp(field, "error") == 0 && message != NULL) { //serverul a intors un mesaj de eroare
     	if(strcmp(context, "get_books") != 0) {
-    		printf("********************************************************\n");
+    		printf("******************************************************************\n");
     		printf("[!] Error message from server: %s\n", message);
-    		printf("********************************************************\n");
+    		printf("******************************************************************\n");
     	}
     	else if(strcmp(context, "get_books") == 0) {
     		printf("*************************************************************************\n");
@@ -59,6 +61,7 @@ int parse_error_msg(JSON_Object *json_obj, const char *field, client_info *clien
     	//se memoreaza authorizarion_token-ul
    		client->auth_token = (char *)calloc(MAX_LEN, sizeof(char));
     	memcpy(client->auth_token, message, strlen(message));
+    	client->token_set = true;
     	return 0;
     }
     return 1;
@@ -84,7 +87,7 @@ int user_register(client_info *client) {
 
     sockfd = open_connection(ADDR, 8080, AF_INET, SOCK_STREAM, 0);
     if(sockfd < 0) {
-        printf("[!]Eroare de conectare la server.");
+        printf("[!] Connect error.");
         exit(1);
     }
 
@@ -94,7 +97,7 @@ int user_register(client_info *client) {
     message = compute_post_request(ADDR, user_register, content_type, &data, 1, NULL, 0, NULL);
     send_to_server(sockfd, message); //trimite cerere de autentificare la server
     response = receive_from_server(sockfd);
-    printf("\n%s\n\n", response); //afiseaza raspunsul dat de server
+   // printf("\n%s\n\n", response); //afiseaza raspunsul dat de server
     //verifica daca serverul a trimis un mesaj de eroare
     //(user folosit de catre altcineva)
     JSON_Value *server_response;
@@ -112,7 +115,7 @@ int user_register(client_info *client) {
     	//cerere de autentificare realizata cu succes
     	//sunt memorate datele user-ului
     	printf("************************************************************************\n");
-    	printf("Inregistrarea a fost realizata cu succes. Poti introduce o noua comanda.\n");
+    	printf("Successful registering. Welcome, %s! Please enter next command.\n", username);
     	printf("************************************************************************\n");
 		close_connection(sockfd);
 		return 0;
@@ -146,7 +149,7 @@ int login(client_info *client, bool *login_flag) {
     send_to_server(sockfd, message);
     char *response = receive_from_server(sockfd);
 
-    printf("\n%s\n\n", response); //raspunsul complet dat de server
+   // printf("\n%s\n\n", response); //raspunsul complet dat de server
 
     JSON_Value *server_response = json_parse_string(strchr(response,'{'));
     JSON_Object *json_obj = json_object(server_response);
@@ -159,9 +162,9 @@ int login(client_info *client, bool *login_flag) {
     }
     else {
     	//login efectuat cu succes, se extrage cookiul de sesiune
-    	printf("*****************************************************************\n");
-    	printf("Autentificare realizata cu succes. Poti introduce o noua comanda.\n");
-    	printf("*****************************************************************\n");
+    	printf("*******************************************************\n");
+    	printf("Successful authentification. Please enter next command.\n");
+    	printf("*******************************************************\n");
 
     	client->username = (char *)calloc(BUFFLEN, sizeof(char));
 		strcpy(client->username, username);
@@ -194,6 +197,7 @@ int login(client_info *client, bool *login_flag) {
 
 	    client->cookie = (char *)calloc(MAX_LEN, sizeof(char));
 	    memcpy(client->cookie, client_cookie, strlen(client_cookie)); 
+	    client->cookie_set = true;
     }
     close_connection(sockfd);
     *login_flag = true;
@@ -207,7 +211,7 @@ void enter_library(client_info *client) {
     char *message = compute_get_request(ADDR, enter_library, NULL, &(client->cookie), 1, NULL);
     send_to_server(sockfd, message);
     char *response = receive_from_server(sockfd);
-    printf("\n%s\n\n", response); //raspunsul complet dat de server
+    //printf("\n%s\n\n", response); //raspunsul complet dat de server
 
     JSON_Value *server_response = json_parse_string(strchr(response,'{'));
     JSON_Object *json_obj = json_object(server_response);
@@ -220,9 +224,9 @@ void enter_library(client_info *client) {
     		//daca serverul nu a intors un mesaj de eroare
     		//se va pasa toke-ul JWT din raspunsul dat de server
     		parse_error_msg(json_obj, "token", client, "enter_library");
-    		printf("**********************************************************************************\n");
-    		printf("Cererea de acces in biblioteca a fost aprobata. Poti introduce urmatoarea comanda.\n");
-    		printf("**********************************************************************************\n");
+    		printf("**************************************************************************\n");
+    		printf("Request for access to the library was approved. Please enter next command.\n");
+    		printf("**************************************************************************\n");
     	}	
     }
     close_connection(sockfd);
@@ -236,8 +240,7 @@ void get_books(client_info *client) {
     char* message = compute_get_request(ADDR, get_books, NULL, &client->cookie, 1, client->auth_token);
     send_to_server(sockfd, message);
     char *response = receive_from_server(sockfd);
-    printf("\n%s\n\n", response); //raspunsul complet dat de server
-
+ 
     const JSON_Value *server_response = json_parse_string(strchr(response,'{'));
     JSON_Object *json_obj = json_object(server_response);
 
@@ -245,7 +248,7 @@ void get_books(client_info *client) {
     if(serv_response_count != 0) {
     	if(parse_error_msg(json_obj, "error", client, "get_books") != -1) { //serverul nu a intors un mesaj de eroare
     		//afiseaza cartile din bibilioteca
-    		printf("*****************************************\n");
+    		printf("****************************************\n");
     		printf("Available books:\n");
     		server_response = json_parse_string(strchr(response,'['));
     		JSON_Array *books = json_value_get_array(server_response);
@@ -254,11 +257,39 @@ void get_books(client_info *client) {
     		printf("****************************************\n");
     	}
     }
+    else {
+    	printf("****************************************\n");
+		printf("The library is empty.\n");
+		printf("****************************************\n");
+    }
     close_connection(sockfd);
 }
 
+//intorce 0 daca datele sunt incomplete sau nu respecta formatarea
+//altfel, intoarce 1
+int check_data(char *title, char *author, char *genre, int page_count, char *publisher) {
+	if(page_count <= 0) {
+		return 0;
+	}
+	if(strlen(title) == 0 || strlen(author) == 0 || strlen(genre) == 0 || strlen(publisher) == 0) {
+		return 0;
+	}
+	return 1;
+}
+
+//intoarce false daca 'name' etse string valid (nu contine doar cifre)
+bool check_valid_string(char *name) {
+	int i;
+	for(i = 0; i < strlen(name); i++) {
+		char c = name[0];
+		if(c > '9' || c < '0') { //caracterul nu este cifra
+			return false;
+		}
+	}
+	return true; //'name' contine doar cifre
+}
+
 void add_book(client_info *client) {
-	printf("---------------------------------------------\n\n");
 	char *title = (char *)calloc(BUFFLEN, sizeof(char));
 	char *author = (char *)calloc(BUFFLEN, sizeof(char));
 	char *genre = (char *)calloc(BUFFLEN, sizeof(char));
@@ -288,61 +319,82 @@ void add_book(client_info *client) {
 	fgets(publisher, BUFFLEN, stdin);
 	publisher[strlen(publisher) - 1] = '\0';
 
-    //Cerere de informatii sumare despre toate cartile
-    char *add_book = "/api/v1/tema/library/books";
+	if(check_data(title, author, genre, page_count, publisher) == 0 || check_valid_string(title) == true 
+		|| check_valid_string(author) == true || check_valid_string(genre) == true 
+		|| check_valid_string(publisher) == true){ 
+  		printf("************************************************************\n");
+  		printf("Wrong data format. Please check the information you entered.\n");
+  		printf("************************************************************\n");
+  		return;
+  	}
+  	else {
+  		char *add_book = "/api/v1/tema/library/books";
+	    int sockfd = open_connection(ADDR, 8080, AF_INET, SOCK_STREAM, 0);
 
-    int sockfd = open_connection(ADDR, 8080, AF_INET, SOCK_STREAM, 0);
+	    char *data = (char *)calloc(MAX_LEN, sizeof(char));
+	   	sprintf(data, "{\"title\":\"%s\",\"author\":\"%s\", \"genre\":\"%s\", \"page_count\":%d, \"publisher\":\"%s\"}", 
+	   		title, author, genre, page_count, publisher);
 
-    char *data = (char *)calloc(MAX_LEN, sizeof(char));
-   	sprintf(data, "{\"title\":\"%s\",\"author\":\"%s\", \"genre\":\"%s\", \"page_count\":%d, \"publisher\":\"%s\"}", 
-   		title, author, genre, page_count, publisher);
+	   	char *content_type = "application/json";
+	    char *message = compute_post_request(ADDR, add_book, content_type, &data, 1, NULL, 0, client->auth_token);
+	   
+	    send_to_server(sockfd, message);
+	    char *response = receive_from_server(sockfd);
+	    JSON_Value *server_response = json_parse_string(strchr(response,'{'));
 
-   	printf("%s\n", data);
-
-   	char *content_type = "application/json";
-    char *message = compute_post_request(ADDR, add_book, content_type, &data, 1, NULL, 0, client->auth_token);
-    printf("Mesaj trimis catre server:\n%s\n", message);
-    send_to_server(sockfd, message);
-    char *response = receive_from_server(sockfd);
-    JSON_Value *server_response = json_parse_string(strchr(response,'{'));
-
-    JSON_Object *json_obj = json_object(server_response);
-    printf("*******de la server: %ld\n",  json_object_get_count(json_obj));
-
-   	printf("token: %s\n", json_object_dotget_string(json_obj, "error"));
-
-    printf("SERVER_RESPONSE:\n%s\n", response);
-    close_connection(sockfd);
+	    JSON_Object *json_obj = json_object(server_response);
+	    int serv_response_count = json_object_get_count(json_obj);
+	  	if(serv_response_count != 0) {
+	  		parse_error_msg(json_obj, "error", client, "add_book");
+	  	}
+	  	//verifica daca informatiile introduse sunt incomplete sau nu respecta formatare
+	  	else {
+	  		printf("**********************************************\n");
+	  		printf("Book \"%s\" successfully added to the library.\n", title);
+	  		printf("**********************************************\n");
+	  	}
+	  	close_connection(sockfd);
+	}
 }
 
-//Vizualizarea delatiilor despre o carte
+//Vizualizarea detaliilor despre o carte
 void get_book(client_info *client) {
 	char *book_id = (char *)calloc(BUFFLEN, sizeof(char));
 	printf("id=");
 	fgets(book_id, BUFFLEN, stdin);
 	book_id[strlen(book_id) - 1] = '\0';
-	printf("%s\n", book_id);
 
 	char *get_book = (char *)calloc(BUFFLEN, sizeof(char));
 	strcpy(get_book, "/api/v1/tema/library/books/");
 	strcat(get_book, book_id);
 
-	printf("calea: %s\n", get_book);
 	int sockfd = open_connection(ADDR, 8080, AF_INET, SOCK_STREAM, 0);
 
     char *message = compute_get_request(ADDR, get_book, NULL, &client->cookie, 1, client->auth_token);
-    printf("Mesaj trimis catre server:\n%s\n", message);
     send_to_server(sockfd, message);
     char *response = receive_from_server(sockfd);
 
     JSON_Value *server_response = json_parse_string(strchr(response,'{'));
 
     JSON_Object *json_obj = json_object(server_response);
-    printf("*******de la server: %ld\n",  json_object_get_count(json_obj));
+    int serv_response_count = json_object_get_count(json_obj);
 
-   	printf("token: %s\n", json_object_dotget_string(json_obj, "error"));
-
-    printf("SERVER_RESPONSE:\n%s\n", response);
+    if(serv_response_count != 0) {
+    	if(parse_error_msg(json_obj, "error", client, "get_book") != -1) { //serverul nu a intors un mesaj de eroare
+    		//printeaza informatiile cerute despre carte
+    		printf("****************************************\n");
+			const char *title = json_object_dotget_string(json_obj, "title");
+			const char *author = json_object_dotget_string(json_obj, "publisher");
+			const char *genre = json_object_dotget_string(json_obj, "genre");
+			double page_count = json_object_dotget_number(json_obj, "page_count");
+			printf("Title: %s\n", title);
+			printf("Author: %s\n", author);
+			printf("Genre: %s\n", genre);
+			printf("Page-cout: %d\n", (int)page_count);	
+    		printf("****************************************\n");
+    	}
+    }
+    
     close_connection(sockfd);
 }
 
@@ -354,26 +406,37 @@ void delete_book(client_info *client) {
 	fgets(book_id, BUFFLEN, stdin);
 	book_id[strlen(book_id) - 1] = '\0';
 
-	char *delete_book = (char *)calloc(BUFFLEN, sizeof(char));
-	strcpy(delete_book, "/api/v1/tema/library/books/");
-	strcat(delete_book, book_id);
+	//verifica daca id-ul introdus are format valid
+	int check_id = atoi(book_id);
+	if(check_id == 0) { //format invalid
+		printf("****************************************\n");
+		printf("[!] Invalid Book Id.\n");
+		printf("****************************************\n");
+	}
+	else {
+		char *delete_book = (char *)calloc(BUFFLEN, sizeof(char));
+		strcpy(delete_book, "/api/v1/tema/library/books/");
+		strcat(delete_book, book_id);
 
-	int sockfd = open_connection(ADDR, 8080, AF_INET, SOCK_STREAM, 0);
+		int sockfd = open_connection(ADDR, 8080, AF_INET, SOCK_STREAM, 0);
+	    char *message = compute_delete_request(ADDR, delete_book, NULL, &client->cookie, 1, client->auth_token);
+	    send_to_server(sockfd, message);
+	    char *response = receive_from_server(sockfd);
 
-    char *message = compute_delete_request(ADDR, delete_book, NULL, &client->cookie, 1, client->auth_token);
-    printf("Mesaj trimis catre server:\n%s\n", message);
-    send_to_server(sockfd, message);
-    char *response = receive_from_server(sockfd);
+	    JSON_Value *server_response = json_parse_string(strchr(response,'{'));
 
-    JSON_Value *server_response = json_parse_string(strchr(response,'{'));
-
-    JSON_Object *json_obj = json_object(server_response);
-    printf("*******de la server: %ld\n",  json_object_get_count(json_obj));
-
-   	printf("token: %s\n", json_object_dotget_string(json_obj, "error"));
-
-    printf("SERVER_RESPONSE:\n%s\n", response);
-    close_connection(sockfd);
+	    JSON_Object *json_obj = json_object(server_response);
+	    int serv_response_count = json_object_get_count(json_obj);
+	    if(serv_response_count != 0) {
+	    	parse_error_msg(json_obj, "error", client, "delete_book");
+	    }
+	    else {
+	    	printf("****************************************\n");
+	    	printf("Book with Id %s successfully deleted.\n", book_id);
+	    	printf("****************************************\n");
+	    }
+	    close_connection(sockfd);
+	}
 }
 
 //Logout
@@ -385,8 +448,7 @@ void logout(client_info *client, bool *login_flag) {
 	char *message = compute_get_request(ADDR, logout, NULL, &client->cookie, 1, NULL);
     send_to_server(sockfd, message);
     char *response = receive_from_server(sockfd);
-    printf("\n%s\n\n", response);
-
+    
     JSON_Value *server_response = json_parse_string(strchr(response,'{'));
     JSON_Object *json_obj = json_object(server_response);
 
@@ -395,11 +457,21 @@ void logout(client_info *client, bool *login_flag) {
     	parse_error_msg(json_obj, "error", client, "logout");
     }
     else {
+    	//logout efectuat cu succes
+    	printf("*********************************************\n");
+    	printf("Successful logout. Bye-bye, %s!\n", client->username);
+    	printf("*********************************************\n");
     	*login_flag = false;
     	memset(client->username, 0, BUFFLEN);
     	memset(client->password, 0, BUFFLEN);
-    	memset(client->cookie, 0, MAX_LEN);
-    	memset(client->auth_token, 0, MAX_LEN);
+    	if(client->cookie_set == true) { //s-a setat un cookie la un moment dat
+    		memset(client->cookie, 0, MAX_LEN);
+    		client->cookie_set = false;
+    	}
+    	if(client->token_set == true) { //s-a setat un auth_token la un moment dat
+    		memset(client->auth_token, 0, MAX_LEN);
+    		client->token_set = false;
+    	}
     }
     close_connection(sockfd);
 }
@@ -408,6 +480,8 @@ int main(int argc, char *argv[]) {
 	char command[BUFFLEN];
 
 	client_info *my_client = (client_info *)malloc(sizeof(client_info));
+	my_client->cookie_set = false;
+	my_client->token_set = false;
 	bool login_flag = false;
 	while(1) {
 		fgets(command, BUFFLEN, stdin);
