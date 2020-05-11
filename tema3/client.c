@@ -18,7 +18,6 @@
 //structura care retine informatii despre client in cadrul aplicatiei
 typedef struct client_info {
 	char *username;
-	char *password;
 	char *cookie; //cookie de sesiune
 	char *auth_token; //token jwt obtinut la enter_library, adaugat in headerul 'Authorization
 	bool cookie_set; //semnaleaza daca a s-a primit cookie-ul de sesiune
@@ -168,9 +167,7 @@ int login(client_info *client, bool *login_flag) {
 
     	client->username = (char *)calloc(BUFFLEN, sizeof(char));
 		strcpy(client->username, username);
-		client->password = (char *)calloc(BUFFLEN, sizeof(char));
-		strcpy(client->password, password);
-
+	
     	char *cookie = (char *)malloc(500 * sizeof(char));
 	    //extrage din raspunsul serverului cookie-ul
 	    char *key = (char *)malloc(100 * sizeof(char));
@@ -313,6 +310,13 @@ void add_book(client_info *client) {
 	printf("page_count=");
 	fgets(page_count_string, BUFFLEN, stdin);
 	page_count_string[strlen(page_count_string) - 1] = '\0';
+	//se incearca introducerea unui numar care nu este intreg pt page_count
+	if(strchr(page_count_string, '.') != NULL || strchr(page_count_string, ',') != NULL) {  
+		printf("************************************************************\n");
+  		printf("Wrong data format. Please check the information you entered.\n");
+  		printf("************************************************************\n");
+  		return;
+	}
 	page_count = atoi(page_count_string);
 
 	printf("publisher=");
@@ -336,7 +340,7 @@ void add_book(client_info *client) {
 	   		title, author, genre, page_count, publisher);
 
 	   	char *content_type = "application/json";
-	    char *message = compute_post_request(ADDR, add_book, content_type, &data, 1, NULL, 0, client->auth_token);
+	    char *message = compute_post_request(ADDR, add_book, content_type, &data, 1, &client->cookie, 0, client->auth_token);
 	   
 	    send_to_server(sockfd, message);
 	    char *response = receive_from_server(sockfd);
@@ -349,9 +353,9 @@ void add_book(client_info *client) {
 	  	}
 	  	//verifica daca informatiile introduse sunt incomplete sau nu respecta formatare
 	  	else {
-	  		printf("**********************************************\n");
+	  		printf("************************************************************\n");
 	  		printf("Book \"%s\" successfully added to the library.\n", title);
-	  		printf("**********************************************\n");
+	  		printf("************************************************************\n");
 	  	}
 	  	close_connection(sockfd);
 	}
@@ -463,7 +467,6 @@ void logout(client_info *client, bool *login_flag) {
     	printf("*********************************************\n");
     	*login_flag = false;
     	memset(client->username, 0, BUFFLEN);
-    	memset(client->password, 0, BUFFLEN);
     	if(client->cookie_set == true) { //s-a setat un cookie la un moment dat
     		memset(client->cookie, 0, MAX_LEN);
     		client->cookie_set = false;
@@ -515,6 +518,9 @@ int main(int argc, char *argv[]) {
 			logout(my_client, &login_flag);
 		}
 		else if(strcmp(command, "exit\n") == 0) { //se iese din program
+			printf("*********************************************\n");
+    		printf("Successful exit. Bye-bye!\n");
+    		printf("*********************************************\n");
 			return 0;
 		}
 		else {
