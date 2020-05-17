@@ -1,0 +1,197 @@
+CONNECTED(00000005)
+---
+Certificate chain
+ 0 s:C = US, ST = California, L = Mountain View, O = Google LLC, CN = *.google.com
+   i:C = US, O = Google Trust Services, CN = GTS CA 1O1
+-----BEGIN CERTIFICATE-----
+MIIJRDCCCCygAwIBAgIRAJvxi9ebRliZAgAAAABjmHEwDQYJKoZIhvcNAQELBQAw
+QjELMAkGA1UEBhMCVVMxHjAcBgNVBAoTFUdvb2dsZSBUcnVzdCBTZXJ2aWNlczET
+MBEGA1UEAxMKR1RTIENBIDFPMTAeFw0yMDA0MTUyMDE2NDdaFw0yMDA3MDgyMDE2
+NDdaMGYxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQH
+Ew1Nb3VudGFpbiBWaWV3MRMwEQYDVQQKEwpHb29nbGUgTExDMRUwEwYDVQQDDAwq
+Lmdvb2dsZS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASOpAMNDKcdUiiA
+uolRuUV6emAzpaslpAXIMtm2XCu6BadtLeFmNkgw2lsnKAhFYIOQZztR79DihYGb
+ScNQVtipo4IG2jCCBtYwDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUF
+BwMBMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFNB9AjabzUcLxZxRDyencGVaxVDp
+MB8GA1UdIwQYMBaAFJjR+G4Q68+b7GCfGJAboOt9Cf0rMGQGCCsGAQUFBwEBBFgw
+VjAnBggrBgEFBQcwAYYbaHR0cDovL29jc3AucGtpLmdvb2cvZ3RzMW8xMCsGCCsG
+AQUFBzAChh9odHRwOi8vcGtpLmdvb2cvZ3NyMi9HVFMxTzEuY3J0MIIEnQYDVR0R
+BIIElDCCBJCCDCouZ29vZ2xlLmNvbYINKi5hbmRyb2lkLmNvbYIWKi5hcHBlbmdp
+bmUuZ29vZ2xlLmNvbYISKi5jbG91ZC5nb29nbGUuY29tghgqLmNyb3dkc291cmNl
+Lmdvb2dsZS5jb22CBiouZy5jb4IOKi5nY3AuZ3Z0Mi5jb22CESouZ2NwY2RuLmd2
+dDEuY29tggoqLmdncGh0LmNugg4qLmdrZWNuYXBwcy5jboIWKi5nb29nbGUtYW5h
+bHl0aWNzLmNvbYILKi5nb29nbGUuY2GCCyouZ29vZ2xlLmNsgg4qLmdvb2dsZS5j
+by5pboIOKi5nb29nbGUuY28uanCCDiouZ29vZ2xlLmNvLnVrgg8qLmdvb2dsZS5j
+b20uYXKCDyouZ29vZ2xlLmNvbS5hdYIPKi5nb29nbGUuY29tLmJygg8qLmdvb2ds
+ZS5jb20uY2+CDyouZ29vZ2xlLmNvbS5teIIPKi5nb29nbGUuY29tLnRygg8qLmdv
+b2dsZS5jb20udm6CCyouZ29vZ2xlLmRlggsqLmdvb2dsZS5lc4ILKi5nb29nbGUu
+ZnKCCyouZ29vZ2xlLmh1ggsqLmdvb2dsZS5pdIILKi5nb29nbGUubmyCCyouZ29v
+Z2xlLnBsggsqLmdvb2dsZS5wdIISKi5nb29nbGVhZGFwaXMuY29tgg8qLmdvb2ds
+ZWFwaXMuY26CESouZ29vZ2xlY25hcHBzLmNughQqLmdvb2dsZWNvbW1lcmNlLmNv
+bYIRKi5nb29nbGV2aWRlby5jb22CDCouZ3N0YXRpYy5jboINKi5nc3RhdGljLmNv
+bYISKi5nc3RhdGljY25hcHBzLmNuggoqLmd2dDEuY29tggoqLmd2dDIuY29tghQq
+Lm1ldHJpYy5nc3RhdGljLmNvbYIMKi51cmNoaW4uY29tghAqLnVybC5nb29nbGUu
+Y29tghMqLndlYXIuZ2tlY25hcHBzLmNughYqLnlvdXR1YmUtbm9jb29raWUuY29t
+gg0qLnlvdXR1YmUuY29tghYqLnlvdXR1YmVlZHVjYXRpb24uY29tghEqLnlvdXR1
+YmVraWRzLmNvbYIHKi55dC5iZYILKi55dGltZy5jb22CGmFuZHJvaWQuY2xpZW50
+cy5nb29nbGUuY29tggthbmRyb2lkLmNvbYIbZGV2ZWxvcGVyLmFuZHJvaWQuZ29v
+Z2xlLmNughxkZXZlbG9wZXJzLmFuZHJvaWQuZ29vZ2xlLmNuggRnLmNvgghnZ3Bo
+dC5jboIMZ2tlY25hcHBzLmNuggZnb28uZ2yCFGdvb2dsZS1hbmFseXRpY3MuY29t
+ggpnb29nbGUuY29tgg9nb29nbGVjbmFwcHMuY26CEmdvb2dsZWNvbW1lcmNlLmNv
+bYIYc291cmNlLmFuZHJvaWQuZ29vZ2xlLmNuggp1cmNoaW4uY29tggp3d3cuZ29v
+Lmdsggh5b3V0dS5iZYILeW91dHViZS5jb22CFHlvdXR1YmVlZHVjYXRpb24uY29t
+gg95b3V0dWJla2lkcy5jb22CBXl0LmJlMCEGA1UdIAQaMBgwCAYGZ4EMAQICMAwG
+CisGAQQB1nkCBQMwLwYDVR0fBCgwJjAkoCKgIIYeaHR0cDovL2NybC5wa2kuZ29v
+Zy9HVFMxTzEuY3JsMIIBBAYKKwYBBAHWeQIEAgSB9QSB8gDwAHYAsh4FzIuizYog
+Todm+Su5iiUgZ2va+nDnsklTLe+LkF4AAAFxf7OaQQAABAMARzBFAiAmd+ekxvnT
+wA6VFTyiCPDbd58feux6JpvogpUzkNTpaAIhAIK88Lu+P51rbLU2gjNQhdEilzqt
+slRcIth/Iw1FkO7iAHYAXqdz+d9WwOe1Nkh90EngMnqRmgyEoRIShBh1loFxRVgA
+AAFxf7OacQAABAMARzBFAiEA/FoQm2OBuxaBi9WIrwmh2IP9w4bLsc1Vcf92sO5/
+zCACIHYICC43Db5O2FUXw24mZrIxX3s5pqe0wDV0zJ/FzpD3MA0GCSqGSIb3DQEB
+CwUAA4IBAQAgaboL5bR6NvdP0rIPDcEQsBJ+E/nxymygwkYh+4r9qGaplkPRQixx
+z33zirfFeUJOAM5Zhjr8xI61qfKnDhRLZvzqOWlMEJhDo8FiwsoaMy6nD686Qc71
+cfGpOrvWEfk/U8UJoDATtmBT+TN/FgB7WKIT2zmC2Krx50uRFVFaT37MaZ1EIxzW
+J/aGxJVWvm34aIqz5Qdw6Tvj/zoxVwRoBNtXVcz10d9hs8TN9IWBrzwd+6SZg9os
+V+hT9mqgeN10ryOWyN74CvBaw73K3hobSkDAyQS1HkbAqJP9VTuvjZl4PE0ndaIN
+yiz/84k5xbSwxO++BuJgMUwj+WaLcvDW
+-----END CERTIFICATE-----
+ 1 s:C = US, O = Google Trust Services, CN = GTS CA 1O1
+   i:OU = GlobalSign Root CA - R2, O = GlobalSign, CN = GlobalSign
+-----BEGIN CERTIFICATE-----
+MIIESjCCAzKgAwIBAgINAeO0mqGNiqmBJWlQuDANBgkqhkiG9w0BAQsFADBMMSAw
+HgYDVQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMjETMBEGA1UEChMKR2xvYmFs
+U2lnbjETMBEGA1UEAxMKR2xvYmFsU2lnbjAeFw0xNzA2MTUwMDAwNDJaFw0yMTEy
+MTUwMDAwNDJaMEIxCzAJBgNVBAYTAlVTMR4wHAYDVQQKExVHb29nbGUgVHJ1c3Qg
+U2VydmljZXMxEzARBgNVBAMTCkdUUyBDQSAxTzEwggEiMA0GCSqGSIb3DQEBAQUA
+A4IBDwAwggEKAoIBAQDQGM9F1IvN05zkQO9+tN1pIRvJzzyOTHW5DzEZhD2ePCnv
+UA0Qk28FgICfKqC9EksC4T2fWBYk/jCfC3R3VZMdS/dN4ZKCEPZRrAzDsiKUDzRr
+mBBJ5wudgzndIMYcLe/RGGFl5yODIKgjEv/SJH/UL+dEaltN11BmsK+eQmMF++Ac
+xGNhr59qM/9il71I2dN8FGfcddwuaej4bXhp0LcQBbjxMcI7JP0aM3T4I+DsaxmK
+FsbjzaTNC9uzpFlgOIg7rR25xoynUxv8vNmkq7zdPGHXkxWY7oG9j+JkRyBABk7X
+rJfoucBZEqFJJSPk7XA0LKW0Y3z5oz2D0c1tJKwHAgMBAAGjggEzMIIBLzAOBgNV
+HQ8BAf8EBAMCAYYwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMBIGA1Ud
+EwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFJjR+G4Q68+b7GCfGJAboOt9Cf0rMB8G
+A1UdIwQYMBaAFJviB1dnHB7AagbeWbSaLd/cGYYuMDUGCCsGAQUFBwEBBCkwJzAl
+BggrBgEFBQcwAYYZaHR0cDovL29jc3AucGtpLmdvb2cvZ3NyMjAyBgNVHR8EKzAp
+MCegJaAjhiFodHRwOi8vY3JsLnBraS5nb29nL2dzcjIvZ3NyMi5jcmwwPwYDVR0g
+BDgwNjA0BgZngQwBAgIwKjAoBggrBgEFBQcCARYcaHR0cHM6Ly9wa2kuZ29vZy9y
+ZXBvc2l0b3J5LzANBgkqhkiG9w0BAQsFAAOCAQEAGoA+Nnn78y6pRjd9XlQWNa7H
+TgiZ/r3RNGkmUmYHPQq6Scti9PEajvwRT2iWTHQr02fesqOqBY2ETUwgZQ+lltoN
+FvhsO9tvBCOIazpswWC9aJ9xju4tWDQH8NVU6YZZ/XteDSGU9YzJqPjY8q3MDxrz
+mqepBCf5o8mw/wJ4a2G6xzUr6Fb6T8McDO22PLRL6u3M4Tzs3A2M1j6bykJYi8wW
+IRdAvKLWZu/axBVbzYmqmwkm5zLSDW5nIAJbELCQCZwMH56t2Dvqofxs6BBcCFIZ
+USpxu6x6td0V7SvJCCosirSmIatj/9dSSVDQibet8q/7UK4v4ZUN80atnZz1yg==
+-----END CERTIFICATE-----
+---
+Server certificate
+subject=C = US, ST = California, L = Mountain View, O = Google LLC, CN = *.google.com
+
+issuer=C = US, O = Google Trust Services, CN = GTS CA 1O1
+
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: ECDSA
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 3787 bytes and written 392 bytes
+Verification: OK
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 256 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+HTTP/1.0 400 Bad Request
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Content-Length: 1555
+Date: Fri, 08 May 2020 08:09:26 GMT
+
+<!DOCTYPE html>
+<html lang=en>
+  <meta charset=utf-8>
+  <meta name=viewport content="initial-scale=1, minimum-scale=1, width=device-width">
+  <title>Error 400 (Bad Request)!!1</title>
+  <style>
+    *{margin:0;padding:0}html,code{font:15px/22px arial,sans-serif}html{background:#fff;color:#222;padding:15px}body{margin:7% auto 0;max-width:390px;min-height:180px;padding:30px 0 15px}* > body{background:url(//www.google.com/images/errors/robot.png) 100% 5px no-repeat;padding-right:205px}p{margin:11px 0 22px;overflow:hidden}ins{color:#777;text-decoration:none}a img{border:0}@media screen and (max-width:772px){body{background:none;margin-top:0;max-width:none;padding-right:0}}#logo{background:url(//www.google.com/images/branding/googlelogo/1x/googlelogo_color_150x54dp.png) no-repeat;margin-left:-5px}@media only screen and (min-resolution:192dpi){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat 0% 0%/100% 100%;-moz-border-image:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) 0}}@media only screen and (-webkit-min-device-pixel-ratio:2){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat;-webkit-background-size:100% 100%}}#logo{display:inline-block;height:54px;width:150px}
+  </style>
+  <a href=//www.google.com/><span id=logo aria-label=Google></span></a>
+  <p><b>400.</b> <ins>That’s an error.</ins>
+  <p>Your client has issued a malformed or illegal request.  <ins>That’s all we know.</ins>
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: 8CD7458EB1C74473E8686F92BDDFFB0EC11FFD4C97F96D2C635CD8324452484D
+    Session-ID-ctx: 
+    Resumption PSK: 1A3E28E2A5B8C07E3FF7EDE3E4A5B3917F1C906B25C72F87949B6F850756EF66AED09255D890A9FDC771D9D84F7C688C
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 172800 (seconds)
+    TLS session ticket:
+    0000 - 01 6f 3b 32 be c2 91 7f-44 f8 7e 89 3f d1 ba b3   .o;2....D.~.?...
+    0010 - eb 44 30 53 41 44 1a 75-cb 41 5b 9e b8 af 48 38   .D0SAD.u.A[...H8
+    0020 - 9d 75 53 b3 00 0b 65 65-8e 5b 36 ba 87 a4 d6 20   .uS...ee.[6.... 
+    0030 - 59 51 5c ea 0b 36 c6 68-38 b0 e7 9f 8f 87 1e a5   YQ\..6.h8.......
+    0040 - d7 41 cd 03 8c 09 89 c5-a2 e2 f2 91 c9 3c 43 50   .A...........<CP
+    0050 - 50 8f 63 40 15 4e ee a2-ce 16 1c 68 9b 67 e3 44   P.c@.N.....h.g.D
+    0060 - 9c 06 4b f5 c6 ed ac 61-44 38 9c b2 c9 d8 f2 02   ..K....aD8......
+    0070 - 46 92 22 b2 2b 7e 6f 8c-51 23 45 76 e4 e9 50 ed   F.".+~o.Q#Ev..P.
+    0080 - 90 40 07 21 bd db e3 21-e8 8f c5 c5 32 bd f7 a7   .@.!...!....2...
+    0090 - 90 0f c5 ec 5f 58 3e 53-0e 8f 04 26 4c 69 8b 19   ...._X>S...&Li..
+    00a0 - 22 38 3d 52 bf 17 a1 f2-a4 5a ba 02 28 65 3a 04   "8=R.....Z..(e:.
+    00b0 - a9 ab b6 1b cf 28 6d 10-16 5f 9f 8a 01 45 59 b0   .....(m.._...EY.
+    00c0 - 33 77 8f 75 40 7d 35 57-e1 ef 55 6d 78 70 c3 36   3w.u@}5W..Umxp.6
+    00d0 - 68 80 b6 ec d0 50 b5 41-a4 19 0b cb a7 88 03 f3   h....P.A........
+    00e0 - 5b ca a0 57 65 d1 b7 08-e5 52 1d b9               [..We....R..
+
+    Start Time: 1588925366
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: A7770B7A59DD61B7DF869172BD4DE8EA8BA183F749A08B004271226FF9220A60
+    Session-ID-ctx: 
+    Resumption PSK: 90C024A4C6BE065A31A16508480F0F46AF48E2883CDE3E0724AA65AAFAE87AFECBE0C5D1A013438579F5D66947B7605F
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 172800 (seconds)
+    TLS session ticket:
+    0000 - 01 6f 3b 32 be c2 91 7f-44 f8 7e 89 3f d1 ba b3   .o;2....D.~.?...
+    0010 - e5 9d de d4 ed 30 22 0d-df ab 68 05 d1 af ea 2f   .....0"...h..../
+    0020 - 72 98 83 ab dd 2b ce 43-80 94 a4 11 88 64 48 4e   r....+.C.....dHN
+    0030 - 06 ee 7f 4f a5 ea b3 26-7b 9e b4 36 f9 88 81 10   ...O...&{..6....
+    0040 - 27 1f 71 96 12 c3 8b 02-2b 6c e9 3e 59 3c b3 7d   '.q.....+l.>Y<.}
+    0050 - 24 61 aa b3 77 da 02 2a-7d 59 d9 ab 26 8f 60 e8   $a..w..*}Y..&.`.
+    0060 - 84 b4 6c c8 d6 c0 0d 32-d3 2a b9 d3 a9 58 76 94   ..l....2.*...Xv.
+    0070 - f2 f7 92 bb b1 16 a9 56-55 a0 7b 32 42 12 62 57   .......VU.{2B.bW
+    0080 - 96 2f 59 00 1d e8 7f 70-66 9f b9 63 10 0c 1e c4   ./Y....pf..c....
+    0090 - 89 51 82 bf de 79 7a 2d-d6 55 18 9e ac 3c 1c c6   .Q...yz-.U...<..
+    00a0 - ef 00 42 76 f4 b6 42 cd-dc 2a 23 b5 1b 7d 9f 37   ..Bv..B..*#..}.7
+    00b0 - d0 fe 7d 64 9b 89 2b cd-50 1e dc 7c 56 6c cc 33   ..}d..+.P..|Vl.3
+    00c0 - 58 1a 54 21 93 fa d4 53-91 f8 81 00 4d 0e 61 8e   X.T!...S....M.a.
+    00d0 - 3b 41 42 e9 d7 c4 bf 12-e2 84 53 3b 2f 7f bf 60   ;AB.......S;/..`
+    00e0 - 1f 71 f3 02 55 e4 e7 fc-f8 f7 05 09               .q..U.......
+
+    Start Time: 1588925366
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
