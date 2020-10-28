@@ -1,5 +1,4 @@
 
-Horovei Andreea, 325CC
 TEMA1 - PROTOCOALE DE COMUNICATIE - ROUTER
 
 In implementarea procesului de dirijare a pachetelor dintr-un router am folosit suportul oferit de laboratoarele 4 si 5, urmarind totodata indicatiile din enunt. Mentionez ca, de asemenea, au fost foarte utile si discutiile de pe forum care m-au ajutat sa inteleg mai bine tot ceea ce am avut de facut.
