@@ -1,4 +1,4 @@
-Horovei Andreea, 325CC
+
 Readme Test practic
 
 	Pentru a reprezenta produsele am definit tipul 'produs' care contine numele celui care l-a comandat si descrierea. Produsele sunt memorate sub forma unui vector de structuri de tipul 'produs'.
