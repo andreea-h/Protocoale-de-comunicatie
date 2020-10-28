@@ -3,7 +3,8 @@
 	Tema3 PC - Client Web. Comunicatie cu REST API
 
 ->Folosirea bibliotecii 'parson'
-	In implementarea solutiei mele, am ales sa folosesc biblioteca 'parson', 
+
+In implementarea solutiei mele, am ales sa folosesc biblioteca 'parson', 
 recomandata in enunt si preluata de la link-ul de github dat. Am ales sa folosesc 
 aceasta biblioteca deoarece sunt de parere ca parsarea raspunsului serverului 
 se poate face intr-o maniera mai eleganta cu functii care opereaza date de tipul 
@@ -25,7 +26,8 @@ formatarea mesajului care trebuie trimis, precum si parsarea raspunsului dat
 de server.
 
 ->Format afisare
-	Am incercat sa printez mesaje catre user dupa fiecare comanda intr-un format 
+
+Am incercat sa printez mesaje catre user dupa fiecare comanda intr-un format 
 cat mai prietenos. In parsarea raspunsului dat se server, am folosit o variabila
 de tipul JSON_Value prin intermediul careia am identificat daca raspunsul contine 
 un mesaj de eroare al serverului. In caz afirmativ, am folosit mesajul dat de 
@@ -50,7 +52,8 @@ logout unde se 'sterg' datele de conectare (cookie si token) ale clientului
 care a parasit biblioteca). 
 
 ->Situatii de eroare tratate
-	Am folosit valorea campului 'login_flag' din structura 'client_info' pentru
+
+Am folosit valorea campului 'login_flag' din structura 'client_info' pentru
 a identifica situatia in care se incearca comanda login, cat timp un user deja
 s-a autentificat. Am tratat acest caz de input invalid prin afisarea unui mesaj 
 de eroare catre user, fara a mai trimite vreau mesaj catre server, trimiterea 
