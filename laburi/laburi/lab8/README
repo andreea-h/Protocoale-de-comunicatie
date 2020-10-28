@@ -1,6 +1,0 @@
-Horovei Andreea
-325CC
-
-Laborator 8 - TCP si multiplexare I/O
-
-	Am reusit sa implementez cerinta din lab, astfel incat serverul poate functiona cu mai multi clienti, acestia putand trimite destinatia respectiv un mesaj. Totul functioneaza ok. 
