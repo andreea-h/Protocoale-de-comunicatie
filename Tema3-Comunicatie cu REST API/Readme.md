@@ -1,4 +1,4 @@
-Horovei Andreea-Georgiana, 325CC
+
 
 	Tema3 PC - Client Web. Comunicatie cu REST API
 
@@ -16,7 +16,7 @@ pentru stabilirea respectiv inchiderea conexiunii cu serverul (open_connection,
 close_connection) si cele pentru trimiterea si primirea de mesaje catre/ de la 
 server (send_to_server si receive_from_server).
 
-	Pentru a mentine conexiunea clientului cu serverul am stabilit ca, in
+Pentru a mentine conexiunea clientului cu serverul am stabilit ca, in
 cadrul implementarii, sa deschid si sa inchid conexiunea pentru fiecare comanda
 pe care o trimite clientul catre server pentru a abordare mai unitara a comenzilor
 cat si pentru a evita erori care pot aparea legate de conexiunea cu serverul.
@@ -38,7 +38,7 @@ de comenzile prezentate in enunt va afisa un mesaj care sa atentioneze userul
 asupra comenzii invalide.
 
 
-	Pentru a retine informatii despre starea curenta a userului adica username, 
+Pentru a retine informatii despre starea curenta a userului adica username, 
 cookie, token jwt am definit structura client_info in care se va completa campul
 username la logarea unei client, numele fiind folosit pentru mesaje care
 sa creeze o interfata cat mai prietenoasa. In structura client_info am inclus si 
@@ -57,7 +57,7 @@ de eroare catre user, fara a mai trimite vreau mesaj catre server, trimiterea
 cererii de login catre server fiind deci conditionata de valorea 'login_flag'
 egala cu false.
 	
-	Pentru situatia in care se cere enter_library in contextul in care nu este
+Pentru situatia in care se cere enter_library in contextul in care nu este
 logat niciun user, am folosit raspunsul dat de server pentru a atentiona userul
 asupra comenzii invalide. Analog am procedat si pentru situatia in care se 
 introduce get_book cu niciun user logat sau fara acces la biblioteca sau cand 
@@ -74,7 +74,7 @@ intr-o data de tipul JSON_Object, are asociata o valoare nenula pentru campul
 construit din raspunsul dat de server, valorile asociate pentru campurile 
 id, title, author, publisher, genre, page_count.
 	
-	Pentru adaugare unei carti, am verificat validitatea campurilor introduse de 
+Pentru adaugare unei carti, am verificat validitatea campurilor introduse de 
 user si, doar daca acestea respecta formatul precizat am trimis cererea catre 
 server. Am tratat aceasta situatie in acest mod deoarece am observat faptul ca
 serverul nu valideaza valorile campurilor introduse. Deci, in abordarea pe care 
