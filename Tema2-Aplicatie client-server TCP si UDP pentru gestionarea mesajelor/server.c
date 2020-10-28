@@ -113,8 +113,18 @@ int find_topic_name(topic *topics_list, int topics_nr, char topic_name[]) {
 	return -1;
 }
 
+int nr_digits(long long number) {
+	int count = 0 ;
+	while(number != 0) {
+		number = number / 10;
+		count++;
+	}
+	return count;
+}
+
+
 //returneaza -1 in cazul in care formatul payload-ului din 'pub_message' este incorect
-//returneaza 1 in cazul in care s-a extras cu succes payload-ul din 'pub_message'
+//returneaza dimendiunea mesajului care trebuie trimis la client in cazul in care s-a extras cu succes payload-ul din 'pub_message'
 int extract_payload(publisher_message *pub_message, subscriber_message *sub_message) {
 	if(pub_message->data_type == 0) { //tipul INT
 		//extrage octetul de semn
@@ -131,20 +141,28 @@ int extract_payload(publisher_message *pub_message, subscriber_message *sub_mess
 		if(*sign == 1) {    //numar negativ
 			result = (-1) * result;
 		}
-		
+		sub_message->message = (char *)malloc(nr_digits((long long)result)* sizeof(char));
+		if(*sign == 1) { //aloca in caracter in plus pt semn
+			sub_message->message = (char *)realloc(sub_message->message, ((1 + nr_digits((long long)result))) * sizeof(char));
+		}
 		sprintf(sub_message->message, "%lld", (long long)result);
 
 		free(number);
-		return 1;
+		return strlen(sub_message->message);
 	}
 	else if(pub_message->data_type == 1) { //tipul SHORT_REAL
 		uint16_t number;
 		memcpy(&number, pub_message->message, 4);
 		number = ntohs(number);
 		double result = number;
+		int num = result;
 		result = result / 100;
+		
+		
+		sub_message->message = (char *)malloc(sizeof(char) * (nr_digits(num) + 1));
 		sprintf(sub_message->message, "%.2f",result);
-		return 1;
+		
+		return strlen(sub_message->message);
 	}
 	else if(pub_message->data_type == 2) { //tipul FLOAT
 
@@ -168,13 +186,16 @@ int extract_payload(publisher_message *pub_message, subscriber_message *sub_mess
 		if(*sign == 1) {
 			rez = (-1) * rez;
 		}
-
+		sub_message->message = (char *)malloc(1 + sizeof(char) * nr_digits(first_part));
 		sprintf(sub_message->message, "%lf", rez);
-		return 1;
+	
+		return strlen(sub_message->message);
 	}
 	else if(pub_message->data_type == 3) { //tipul STRING
-		memcpy(sub_message->message, pub_message->message, sizeof(sub_message->message));
-		return 1;
+		sub_message->message = (char *)calloc(1, strlen(pub_message->message));
+		strcpy(sub_message->message, pub_message->message);
+		
+		return strlen(sub_message->message);
 	}
 	return -1;
 }
@@ -189,14 +210,9 @@ void free_function() {
 		}
 		//elibereaza memoria alocata pentru stocarea mesajelor in situatia sf=1
 		if(clients[i].stored != 0) {
-			int k;
-			for(k = 0; k < clients[i].stored; k++) {
-			//	free(&(clients[i].stored_messages[k]));
-			}
 			free(clients[i].stored_messages);
 		}
 		else {
-		//	free(&(clients[i].stored_messages[0]));
 			free(clients[i].stored_messages);
 		}
 	}
@@ -303,8 +319,10 @@ int main(int argc, char *argv[])
 		}
 
 		for (int i = 0; i <= fd_max; i++) {
+
 			if (FD_ISSET(i, &tmp_fds)) {
 
+				//printf("valoare i: %d\n", i);
 				if(i == 0) { //se citeste de la stdin
 					memset(buff, 0, BUFLEN);
 					fgets(buff, BUFLEN - 1, stdin);
@@ -353,7 +371,7 @@ int main(int argc, char *argv[])
 						clients[clients_nr].socket = new_sock_fd; //socketul pe care s-a acceptat conexiunea clientului cu serverul
 						clients[clients_nr].topics = (topic *)calloc(1, sizeof(topic));
 						clients[clients_nr].topics_nr = 0;
-						clients[clients_nr].stored_messages = (subscriber_message *)calloc(1, sizeof(subscriber_message));
+						clients[clients_nr].stored_messages = (to_forward_msg *)calloc(1, sizeof(to_forward_msg));
 						clients[clients_nr].stored = 0; 
 						clients_nr++;
 
@@ -370,15 +388,10 @@ int main(int argc, char *argv[])
 							fd_max = new_sock_fd;
 						}
 						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
-						subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-						strcpy(server_msg->message, "Available Client_Id.\n");
+						char *response = (char *)malloc(100 * sizeof(char));
+						strcpy(response, "Available Client_Id.\n");
+						send(new_sock_fd, response, strlen(response) + 1, 0);
 						
-						ret = send(new_sock_fd, server_msg, sizeof(subscriber_message), 0);
-						if(ret < 0) {
-							exit_error("[!] Send error in server...\n");
-							exit(1);
-						}
-						free(server_msg);
 					}
 					else if(check_client_unique(buff) == 0) { //s-a facut o cerere de reconectare
 						printf("New client (%s) connected from %s:%hu.\n",
@@ -395,91 +408,86 @@ int main(int argc, char *argv[])
 						current_client->socket = new_sock_fd;
 
 						//semnaleaza printr-un mesaj trimis catre client faptul ca client_id-ul este unul valid
-						subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-						strcpy(server_msg->message, "There are messages that need to be forwarded?\n");
-						
-						ret = send(new_sock_fd, server_msg, sizeof(subscriber_message), 0);
-						if(ret < 0) {
-							exit_error("[!] Send error in server...\n");
-							exit(1);
-						}
+						char *response = (char *)malloc(100 * sizeof(char));
+						strcpy(response, "There are messages that need to be forwarded?\n");
+						send(new_sock_fd, response, strlen(response) + 1, 0);
 
 						//trimite catre client mesajele stocate pentru forward
 						int c = 0;
-						subscriber_message msg;
-						for(c = 0; c < current_client->stored; c++) {
-							msg = current_client->stored_messages[c];
-							printf("TOOOOPIC: %s; dimeniune date: %ld\n", msg.topic_name, sizeof(subscriber_message));
-							printf("%s:%hu - %s - %s - %s\n", msg.ip_source, msg.client_port, 
-								msg.topic_name, msg.data_type, msg.message);
 
-							ret = send(new_sock_fd, &msg, sizeof(subscriber_message), 0);
+						to_forward_msg *vect = current_client->stored_messages;
+						for(c = 0; c < current_client->stored; c++) {
+							int buff_size = strlen(vect[c].message);
+							ret = send(new_sock_fd, &buff_size, sizeof(buff_size), 0);
+							if(ret < 0) {
+								exit_error("[!] Send error in server...\n");
+								exit(1);
+							}
+
+							ret = send(new_sock_fd, vect[c].message, strlen(vect[c].message), 0);
 							if(ret < 0) {
 								exit_error("[!] Send error in server...\n");
 								exit(1);
 							}
 							
 							//odata trimise mesajele, acestea vor fi eliminate din vector
-						/*	int j;
-							printf("STORED pentru %s  ....  %d\n", current_client->id_client, current_client->stored);
+							int j;
+							
 							for(j = c; j < current_client->stored - 1; j++) {
 								current_client->stored_messages[j] = current_client->stored_messages[j + 1];
 							}
 							c--;
 							(current_client->stored)--;
-							//free(&(current_client->stored_messages[c]));*/
-						}	
-						int j;
-						//printf("STORED pentru %s  ....  %d\n", current_client->id_client, current_client->stored);
-						free(current_client->stored_messages);
-						current_client->stored_messages = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-						current_client->stored = 0;
-
-						//dupa trimiterea mesajelor, se elibereaza memoria alocata pentru stocarea acestora
-						free(server_msg);
+						}				
 					}
 					else { //id_client-ului nu este valid -> se va trimite catre client un mesaj
 						   //astfel incat clientul sa interpreteze eroarea din mesajul pe care acesta a intentionat sa il trimita catre server
-						subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-						strcpy(server_msg->message, "[!] This Client_ID is already in use! Try to use another Client_ID!\n");
-						
-						ret = send(new_sock_fd, server_msg, sizeof(subscriber_message), 0);
-						if(ret < 0) {
-							exit_error("[!] Send error in server...\n");
-							exit(1);
-						}
-						free(server_msg);
+						char *response = (char *)malloc(100 * sizeof(char));
+						strcpy(response, "[!] This Client_ID is already in use! Try to use another Client_ID!\n");
+						send(new_sock_fd, response, strlen(response) + 1, 0);
 						close(new_sock_fd);
 					}	
 				}
 				else if(i == pass_socket_udp) { //serverul va primi datagrame de la clienti udp
 					memset(buff, 0, BUFLEN);
-					int check = 1;
-					setsockopt(i, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
-
-					socklen_t socklen;
+					
+					socklen_t len = sizeof(udp_sock);
 					
 					//memoreaza mesajul udp trimis la server de catre clientul upd
 					publisher_message *pub_message = (publisher_message *)calloc(1, sizeof(publisher_message));
 					
 					memset(buff, 0, BUFLEN);
-					int rec = recvfrom(pass_socket_udp, buff, BUFLEN, 0, (struct sockaddr *) &udp_sock, &socklen);
+
+					int rec = recvfrom(pass_socket_udp, buff, BUFLEN, 0, (struct sockaddr *) &udp_sock, &len);
 				
 					if(rec < 0) {
 						exit_error("[!] Receiving error\n");
-						exit(1);
 					}
 					
 					//mesajul upd trebuie trimis mai departe catre clientii tcp abonati la topicul din mesaj
 					//formateaza mesajul udp primit
 					
 					memmove(pub_message, buff, sizeof(publisher_message));
-
+			
+					int dim_topic = htonl(strlen(pub_message->topic_name) + 1);
+			
+					int dim_mesaj;
 					//se construieste mesajul tcp catre clienti pe baza mesajului upd primit
 					//'sub_message' retine mesajul trimis clientilor TCP de catre server
 					subscriber_message *sub_message = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-					
+
+					sub_message->topic_name = (char *)malloc(dim_topic * sizeof(char));
+					strcat(pub_message->topic_name, "\0");
+
 					strcpy(sub_message->topic_name, pub_message->topic_name);
+
+					int set_payload = extract_payload(pub_message, sub_message);
+					strcat(sub_message->message, "\0");
+					if(set_payload < 0) { //-1 -> payload eronat
+						exit_error("[!] Payload format error...\n");
+						continue;
+					}
+					
 					if(pub_message->data_type == 0) {
 						strcpy(sub_message->data_type, "INT");
 					}
@@ -493,46 +501,92 @@ int main(int argc, char *argv[])
 						strcpy(sub_message->data_type, "STRING");
 					}
 
-					//formateaza payload-ul mesajului care trebuie trimis de catre server
-					//completeaza campul 'sub_message.message' cu valoarea payloadului extras din 'pub_message'
-					int set_payload = extract_payload(pub_message, sub_message);
-					if(set_payload < 0) {
-						exit_error("[!] Payload format error...\n");
-						continue;
-					}
-				
+					dim_mesaj = htonl(set_payload + 1);
+
+					dimensions d;
+					d.dim_topic = dim_topic;
+					d.dim_msg = dim_mesaj;
+
 					sub_message->client_port = ntohs(udp_sock.sin_port);
                     strcpy(sub_message->ip_source, inet_ntoa(udp_sock.sin_addr));
 
-                    //cauta clientii care au in lista de topicuri acele topicuri cu numele 'sub_message.topic_name'
-                    int i;
-                    for(i = 0; i < clients_nr; i++) {
-                    	//intoarce 1 daca topic_name exista in lista de topicuri la care este abonat clientul
-                    	//clientul de la indexul 'i' este abonat la topic
-                    	int pos = find_topic_name(clients[i].topics, clients[i].topics_nr, sub_message->topic_name);
-                    	if(pos != -1 && clients[i].connected == 1) { //clientul este conectat
-                    		int check = 1;
-							setsockopt(clients[i].socket, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
+                    int dim_notification = ntohl(dim_mesaj) + ntohl(dim_topic) + sizeof(sub_message->ip_source) +
+                    	sizeof(sub_message->client_port) + sizeof(sub_message->data_type);
 
-                    		int ret = send(clients[i].socket, sub_message, sizeof(subscriber_message), 0);
+                    char *server_message = (char *)calloc(dim_notification, sizeof(char));
+					strcpy(server_message, sub_message->ip_source);
+					strcat(server_message, ":");
+					char port[5];
+
+					sprintf(port, "%hu", sub_message->client_port);
+					strcat(server_message, port);
+					strcat(server_message, " - ");
+					strcat(server_message, sub_message->topic_name);
+					strcat(server_message, " - ");
+					strcat(server_message, sub_message->data_type);
+					strcat(server_message, " - ");
+					strcat(server_message, sub_message->message);
+
+					int buff_size = strlen(server_message);
+
+					//formateaza payload-ul mesajului care trebuie trimis de catre server
+					//completeaza campul 'sub_message.message' cu valoarea payloadului extras din 'pub_message'
+					
+					//inainte de a trimite mesajul catre client, trimite catre acesta un mesaj care sa contina nrBytes pt nume_topic 
+					//respectiv nrBytes pentru continut_mesaj
+					int u;
+					for(u = 0; u < clients_nr; u++) {
+                    	//intoarce 1 daca topic_name exista in lista de topicuri la care este abonat clientul
+                    	//clientul de la indexul 'u' este abonat la topic
+                    	int pos = find_topic_name(clients[u].topics, clients[u].topics_nr, pub_message->topic_name);
+                    	if(pos != -1 && clients[u].connected == 1) { //clientul este conectat
+                    		int check = 1;
+							setsockopt(clients[u].socket, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
+
+                    		int ret = send(clients[u].socket, &buff_size, sizeof(buff_size), 0);
+                    
                     		if(ret < 0) {
 								exit_error("[!] Send error...\n");
 								exit(1);
 							}
                     	}
-                    	//clientul de la indexul 'i' este deconectat momentan
+                    }
+					
+					//cauta clientii care au in lista de topicuri acele topicuri cu numele 'sub_message.topic_name'
+                    for(u = 0; u < clients_nr; u++) {
+                    	//intoarce 1 daca topic_name exista in lista de topicuri la care este abonat clientul
+                    	//clientul de la indexul 'u' este abonat la topic
+                    	int pos = find_topic_name(clients[u].topics, clients[u].topics_nr, sub_message->topic_name);
+                    	if(pos != -1 && clients[u].connected == 1) { //clientul este conectat
+                    		int check = 1;
+							setsockopt(clients[u].socket, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int));
+							//memoreaza mesajul care trebuie trimis intr-un char* concatenand toate campurile din sub_message
+							send(clients[u].socket, server_message, strlen(server_message), 0);
+							
+                    		if(ret < 0) {
+								exit_error("[!] Send error...\n");
+								exit(1);
+							}
+                    	}
+                    	//clientul de la indexul 'u' este deconectat momentan
                     	//dar abonat la topic avand SF == 1
-                    	else if(pos != -1 && clients[i].connected == 0 && clients[i].topics[pos].st == 1) {
-                    		clients[i].stored_messages = realloc(clients[i].stored_messages, (clients[i].stored + 1) * sizeof(subscriber_message));
-                    		memcpy(&(clients[i].stored_messages[clients[i].stored]), sub_message, sizeof(subscriber_message));
-                    		(clients[i].stored)++;
-                    		//printf("STORED pentru %s  ....  %d\n", clients[i].id_client, clients[i].stored);
+                    	
+                    	else if(pos != -1 && clients[u].connected == 0 && clients[u].topics[pos].st == 1) {
+                    		to_forward_msg send;
+                    		send.dimensions.dim_topic = d.dim_topic;
+                    		send.dimensions.dim_msg = d.dim_msg;
+                    		send.message = (char *)calloc(dim_notification, sizeof(char));
+                    		clients[u].stored_messages = realloc(clients[u].stored_messages, (clients[u].stored + 1) * sizeof(to_forward_msg));
+                    		clients[u].stored_messages[clients[u].stored].message = (char *)calloc(dim_notification, sizeof(char));
+                    		strcpy(clients[u].stored_messages[clients[u].stored].message, server_message);
+                    		clients[u].stored_messages[clients[u].stored].dimensions.dim_topic = d.dim_topic;
+                    		clients[u].stored_messages[clients[u].stored].dimensions.dim_msg = d.dim_msg;
+                    	
+                    		(clients[u].stored)++;
                     	}
                     }
-                    free(pub_message);
-                    free(sub_message);
 				}
-
+				
 				else {
 					int check = 1;
 					setsockopt(i, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
@@ -564,30 +618,31 @@ int main(int argc, char *argv[])
 					else {
 						if(client_msg.request_type == 'u') {
 							
-							//printf("unsubscribe\n");
 							//sterge topicul cu numele primit din lista topicurilor la care este abonat clientul
 							//functia 'remove_topic' intoarce -1 daca topicul nu este prezent in lista topicurilor la care este abonat clientul
 							int result = remove_topic(tcp_client->id_client, client_msg.request_topic.topic_name); 
 							if(result == -1) {
 								//trimite catre client un mesaj de eroare prin intermediul caruia clientul poate sa interpreteze problema 
 								//care a aparut in continutul datelor trimise catre server
-								subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-								strcpy(server_msg->message, "[!] Invalid unsubscribe command! You are not subscribed to this topic!\n");
-								ret = send(i, server_msg, sizeof(subscriber_message), 0);
+								char *response = (char *)malloc(100 * sizeof(char));
+								strcpy(response, "[!] Invalid unsubscribe command! You are not subscribed to this topic!\n");
+								ret = send(i, response, strlen(response) + 1, 0);
 								if(ret < 0) {
 									exit_error("[!] Send error in server...\n");
 									exit(1);
 								}
+							
 							}
 							else {
-								subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-								strcpy(server_msg->message, "Successfully subscribed topic\n");
-								ret = send(i, server_msg, sizeof(subscriber_message), 0);
+								char *response = (char *)malloc(100 * sizeof(char));
+								strcpy(response, "Successfully unsubscribed topic\n");
+								ret = send(i, response, strlen(response) + 1, 0);
 								if(ret < 0) {
 									exit_error("[!] Send error in server...\n");
 									exit(1);
 								}
 							}
+							
 						}
 						else if(client_msg.request_type == 's') {
 							int check_topic = find_topic_name(tcp_client->topics, tcp_client->topics_nr, client_msg.request_topic.topic_name);
@@ -599,30 +654,24 @@ int main(int argc, char *argv[])
 								int new_sf = client_msg.request_topic.st;
 								if(new_sf != old_sf) { //modifica valoarea pentru sf si trimite un mesaj sugestiv catre client
 									tcp_client->topics[check_topic].st = client_msg.request_topic.st;
-									subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-						
-									strcpy(server_msg->topic_name, tcp_client->topics[check_topic].topic_name);
-									strcpy(server_msg->message, "SF option updated successfully\n");
-									
-									ret = send(i, server_msg, sizeof(subscriber_message), 0);
+								
+									char *response = (char *)malloc(100 * sizeof(char));
+									strcpy(response, "SF option updated successfully\n");
+									ret = send(i, response, strlen(response) + 1, 0);
 									if(ret < 0) {
 										exit_error("[!] Send error in server...\n");
 										exit(1);
 									}
-									free(server_msg);
 								}
 								if(new_sf == old_sf) { //cerere de subscribe invalida
-									subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-						
-									strcpy(server_msg->topic_name, tcp_client->topics[check_topic].topic_name);
-									strcpy(server_msg->message, "[!] Subscribe error...You have already subscribed to this topic...\n");
 									
-									ret = send(i, server_msg, sizeof(subscriber_message), 0);
+									char *response = (char *)malloc(100 * sizeof(char));
+									strcpy(response, "[!] Subscribe error...You have already subscribed to this topic...\n");
+									ret = send(i, response, strlen(response) + 1, 0);
 									if(ret < 0) {
 										exit_error("[!] Send error in server...\n");
 										exit(1);
 									}
-									free(server_msg);
 								}
 							}
 
@@ -633,17 +682,15 @@ int main(int argc, char *argv[])
 								new_topic.st = client_msg.request_topic.st;
 								tcp_client->topics = (topic *)realloc(tcp_client->topics, (tcp_client->topics_nr + 2) * sizeof(topic));
 								tcp_client->topics[tcp_client->topics_nr++] = new_topic;
-								
-								subscriber_message *server_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-								//strcpy(server_msg->topic_name, tcp_client->topics[check_topic].topic_name);
-								strcpy(server_msg->message, "Successfully subscribed topic\n");
-									
-								ret = send(i, server_msg, sizeof(subscriber_message), 0);
+
+								char *response = (char *)malloc(100 * sizeof(char));
+								strcpy(response, "Successfully subscribed topic\n");
+								ret = send(i, response, strlen(response) + 1, 0);
 								if(ret < 0) {
 									exit_error("[!] Send error in server...\n");
 									exit(1);
 								}
-								free(server_msg);
+								
 							}
 						}		
 					}

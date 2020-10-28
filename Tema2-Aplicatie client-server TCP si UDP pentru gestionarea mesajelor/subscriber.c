@@ -86,22 +86,23 @@ int main(int argc, char *argv[])
 	int check = 1;
 	setsockopt(sock_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int)); 
 
-	subscriber_message *client_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-	val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
-
+	char *response = (char *)malloc(100 * sizeof(char));
+    val = recv(sock_fd, response, 100, 0);
+   
     //verifica daca mesajul pe care il trimite serverul ca raspuns la cererea de conectare semnaleaza o eroare 
     //in ceea ce priveste inputul la nivelul clientului
-    char *check_msg = (char *)calloc(100, sizeof(char));
-    memcpy(check_msg, client_msg->message, 100);
-    if(strcmp(check_msg, "[!] This Client_ID is already in use! Try to use another Client_ID!\n") == 0) {
+    if(strcmp(response, "[!] This Client_ID is already in use! Try to use another Client_ID!\n") == 0) {
         exit_error("[!] This Client_ID is already in use! Try to use another Client_ID!\n");
 		close(sock_fd);
 		return 0;
     } 
+    else if(strcmp(response, "There are messages that need to be forwarded?\n") == 0) {
+        
+    }
+	else if(strcmp(response, "Available Client_Id.\n") == 0) {
+        
+    }
 
-    free(client_msg);
-    free(check_msg);
-   
 	while(1) {
 		tmp_fds = read_fds;
 		val = select(fdmax + 1, &tmp_fds, NULL, NULL, NULL);
@@ -119,7 +120,6 @@ int main(int argc, char *argv[])
 			if (strcmp(buffer, "exit\n") == 0) {
 				break;
 			}
-
 			//verifica daca comanda pe care o trimite clientul catre server respecta formatul enuntat
 			//in caz de input incorect, este afisat un mesaj de eroare adresat clientului
 			char *buff_temp = (char *)calloc(BUFLEN, sizeof(char));
@@ -193,8 +193,10 @@ int main(int argc, char *argv[])
 			}
 			
 			//analizeaza raspunsul pe care il da serverul in aceasta situatie
-			subscriber_message server_msg;
-			ret = recv(sock_fd, &server_msg, sizeof(subscriber_message), 0);
+			//subscriber_message server_msg;
+			char *response = (char *)malloc(100 * sizeof(char));
+			//ret = recv(sock_fd, &server_msg, sizeof(subscriber_message), 0);
+			ret = recv(sock_fd, response, 100, 0);
 			if(ret < 0) {
 				exit_error("[!] Send error in client...\n");
 				exit(1);
@@ -202,18 +204,18 @@ int main(int argc, char *argv[])
 
 			//verifica raspunsul de la server in functie de tipul de cerere care a fost trimisa
 			if(request->request_type == 's') {
-				if(strcmp(server_msg.message, "SF option updated successfully\n") == 0) {
+				if(strcmp(response, "SF option updated successfully\n") == 0) {
 					printf("SF option updated successfully\n");
 					continue;
 				}
-				else if(strcmp(server_msg.message, "[!] Subscribe error...You have already subscribed to this topic...\n") == 0) {
+				else if(strcmp(response, "[!] Subscribe error...You have already subscribed to this topic...\n") == 0) {
 					printf("[!] Subscribe error...You have already subscribed to this topic...\n");
 					continue;
 				}
 			}
 			if(request->request_type == 'u') {
 				//verifica prin mesajul primit de la client daca s-a trimis o comanda valida de unsubscribe
-				if(strcmp(server_msg.message, "[!] Invalid unsubscribe command! You are not subscribed to this topic!\n") == 0) {
+				if(strcmp(response, "[!] Invalid unsubscribe command! You are not subscribed to this topic!\n") == 0) {
 					printf("[!] Invalid unsubscribe command! You are not subscribed to this topic!\n");
 					continue;
 				}
@@ -232,10 +234,22 @@ int main(int argc, char *argv[])
 		else {
             memset(buffer, 0, BUFLEN);
 
-            //subscriberul primeste notificare de la server pentru unul dintre topicurile la care este abonat
-            subscriber_message *client_msg = (subscriber_message *)calloc(1, sizeof(subscriber_message));
-            int val = recv(sock_fd, client_msg, sizeof(subscriber_message), 0);
+            int check = 1;
+			setsockopt(sock_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&check, sizeof(int));
 
+            //inainte de a primi orice notificare, clientul primeste dimensiunea topicului si a mesajului
+            
+     		dimensions *rec_dim = (dimensions *)calloc(1, sizeof(dimensions));
+     		int buff_size;
+
+     		int val = recv(sock_fd, &buff_size, sizeof(buff_size), 0);
+     		
+
+            char *response = (char *)malloc(sizeof(char) * buff_size);
+            val = recv(sock_fd, response, buff_size, 0);
+            response[val] = '\0';
+            printf("%s\n", response);
+           
             //verifica daca mesajul pe care il trimite serverul semnaleaza o eroare
             if(val < 0) {
 				exit_error("[!] Receiving error for client...\n");
@@ -243,22 +257,8 @@ int main(int argc, char *argv[])
 			}
 
             if(val == 0) { //serverul a inchis conexiunea
-            	free(client_msg);
             	break;
-            } 
-
-            if(strcmp(client_msg->message, "There are messages that need to be forwarded?\n") == 0) {
-            	continue;
             }
-
-            if(strcmp(client_msg->message, "Available Client_Id.\n") == 0) {
-            	continue;
-            }
-
-			printf("%s:%hu - %s - %s - %s\n", client_msg->ip_source, client_msg->client_port, 
-				client_msg->topic_name, client_msg->data_type, client_msg->message);
-
-			free(client_msg);
 		}
 	}
 	

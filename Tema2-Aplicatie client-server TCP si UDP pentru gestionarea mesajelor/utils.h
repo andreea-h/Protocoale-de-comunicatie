@@ -22,14 +22,25 @@ typedef struct client_request {
 	char client_id[11];//id_clientului care a facut cererea
 } __attribute__((packed))client_request;
 
+
 //structura care descrie un mesaj trimis de la server catre un client TCP
 typedef struct subscriber_message {
-	char topic_name[51];
-	char data_type[11]; //specifica tipul de date
-	char message[1501]; //valoarea mesajului
 	char ip_source[16]; //ip-ul clientului udp care a trimis un mesaj catre server
 	unsigned short client_port; //portul clientului udp care a trimis mesajul
+	char data_type[11]; //specifica tipul de date
+	char *topic_name;
+	char *message; //valoarea mesajului
 } __attribute__((packed))subscriber_message;
+
+typedef struct dimensions {
+	int dim_topic;
+	int dim_msg;
+} __attribute__((packed))dimensions;
+
+typedef struct to_forward_msg {
+	dimensions dimensions;
+	char *message;
+} __attribute__((packed))to_forward_msg;
 
 //structura care descrie un client
 typedef struct client {
@@ -38,7 +49,8 @@ typedef struct client {
 	int topics_nr; //numarul de topicuri la care este abonat clientul
 	int connected; //1 - client online, 0 - client deconectat
 	int socket;
-	subscriber_message *stored_messages; //retine mesajele trimise clientului cat timp acesta este deconectat
+	//subscriber_message *stored_messages; //retine mesajele trimise clientului cat timp acesta este deconectat
+	to_forward_msg *stored_messages;
 	int stored; //numarul de mesaje stocate care urmeaza a fi trimise la reconectarea clientului
 } __attribute__((packed))client;
 
@@ -48,11 +60,4 @@ typedef struct publisher_message {
 	uint8_t data_type; //specifica tipul de date
 	char message[1501]; //valoarea mesajului
 } __attribute__((packed)) publisher_message;
-
-//structura folosita pentru a trimite de la server catre clientii tcp feedback 
-//pentru comenzile 'subscribe', 'unsubscribe' si pentru conectarea unui client nou
-typedef struct server_response {
-	int ok; //1 - cererea clientului a fost prelucrata cu succes la nivelul serverului, 0 - input-ul dat de client este eronat
-	char error_message[60]; //mesajul de eroare trimis de catre server
-} __attribute__((packed))server_response;
 
